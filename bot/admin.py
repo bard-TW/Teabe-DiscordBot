@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds, JoinGuildMsg
+from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds, JoinGuildCipher
 # Register your models here.
 
 
@@ -35,7 +35,7 @@ class BoTHelloRespondsAdmin(admin.ModelAdmin):
     list_display = ('respond',)
 admin.site.register(BotHelloResponds, BoTHelloRespondsAdmin)
 
-class JoinGuildMsgAdmin(admin.ModelAdmin):
+class JoinGuildCipherAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'msg1', 'msg2', 'msg3', 'msg4', 'msg5')
 
-admin.site.register(JoinGuildMsg, JoinGuildMsgAdmin)
+admin.site.register(JoinGuildCipher, JoinGuildCipherAdmin)
