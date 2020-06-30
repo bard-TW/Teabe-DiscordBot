@@ -6,7 +6,7 @@ from bot.core.classes import Cog_Extension
 from django.conf import settings
 
 from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher
-
+from discord.ext.commands import has_permissions, MissingPermissions
 # log
 import logging
 import time
@@ -102,7 +102,10 @@ class Event(Cog_Extension):
         if not joinGuildCipher:
             JoinGuildCipher.objects.create(guild_id=guild_data[0])
 
-
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, MissingPermissions):
+            await ctx.send('您缺少權限！')
 
 def setup(bot):
     bot.add_cog(Event(bot))

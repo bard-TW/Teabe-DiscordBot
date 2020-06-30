@@ -5,6 +5,7 @@ from bot.core.classes import Cog_Extension
 from django.conf import settings
 
 from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher
+from discord.ext.commands import has_permissions
 
 import asyncio
 
@@ -15,7 +16,6 @@ logger = logging.getLogger('bot')
 
 
 class Setting(Cog_Extension):
-
     @commands.group()
     async def setting(self, ctx):
         if not ctx.guild:
@@ -25,6 +25,7 @@ class Setting(Cog_Extension):
         ctx.guildConfig = Info_guildConfig.objects.get(guild_id=ctx.guild_id)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def look(self, ctx):
         if ctx.guild:
             data = f"{settings.BOT_NAME}伺服器設定查看\n```diff\n"
@@ -60,6 +61,7 @@ class Setting(Cog_Extension):
             await ctx.send(data)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def previou_is_valid(self, ctx):
         # 推齊
         if ctx.guild:
@@ -68,6 +70,7 @@ class Setting(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def respond_is_valid(self, ctx):
         # 回應
         if ctx.guild:
@@ -76,6 +79,7 @@ class Setting(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def respond_only_guild(self, ctx):
         # 只說伺服器內教的
         if ctx.guild:
@@ -84,6 +88,7 @@ class Setting(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def join_msg_is_valid(self, ctx):
         # 開啟進群通知
         if ctx.guild:
@@ -92,6 +97,7 @@ class Setting(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def leave_msg_is_valid(self, ctx):
         # 開啟離群通知
         if ctx.guild:
@@ -100,6 +106,7 @@ class Setting(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def join_guild_cipher_is_valid(self, ctx):
         # 開啟進群密語
         if ctx.guild:
@@ -108,6 +115,7 @@ class Setting(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def join_guild_msg_channel(self, ctx):
         # 進群的訊息頻道
         if ctx.guild:
@@ -118,6 +126,7 @@ class Setting(Cog_Extension):
             await ctx.send('此頻道為進群通知頻道')
 
     @setting.command()
+    @has_permissions(manage_roles=True)
     async def leave_guild_msg_channel(self, ctx):
         # 離群的訊息頻道
         if ctx.guild:
@@ -128,12 +137,13 @@ class Setting(Cog_Extension):
             await ctx.send('此頻道為離群通知頻道')
 
     @setting.group()
+    @has_permissions(manage_roles=True)
     async def cipher(self, ctx):
         if ctx.guild:
             ctx.cipher = JoinGuildCipher.objects.get(guild_id=ctx.guild_id)
-        
 
     @cipher.command()
+    @has_permissions(manage_roles=True)
     async def test(self, ctx):
         if ctx.guild:
             msgs = [ctx.cipher.msg1, ctx.cipher.msg2, ctx.cipher.msg3, ctx.cipher.msg4, ctx.cipher.msg5]
@@ -143,6 +153,7 @@ class Setting(Cog_Extension):
                 await asyncio.sleep(2)
 
     @cipher.command()
+    @has_permissions(manage_roles=True)
     async def modify(self, ctx, num, *, msg):
         if ctx.guild:
             try:

@@ -29,9 +29,9 @@ class Base(Cog_Extension):
         data_1 += f"範例: {settings.PREFIX}學 無聊怎麼辦 打後7 打中4 打前6 打騎士 耍費 睡覺\n\n"
 
         data_1 += f"觸發回 最後 回應:\n"
-        data_1 += f"- ME: 無聊怎麼辦    提比: 睡覺\n"
+        data_1 += f"- ME: 無聊怎麼辦    {settings.BOT_NAME}: 睡覺\n"
         data_1 += f"觸發回 隨機 回應:\n"
-        data_1 += f"- ME: 提比無聊怎麼辦    提比: 打後7\n\n"
+        data_1 += f"- ME: {settings.BOT_NAME}無聊怎麼辦    {settings.BOT_NAME}: 打後7\n\n"
 
         data_1 += f"+ {settings.BOT_NAME}查看指令\n"
         data_1 += f"API: {settings.PREFIX}查看清單 <空白\\@標記使用者>\n"
@@ -55,10 +55,14 @@ class Base(Cog_Extension):
         data_10 += f"說明: 查看延遲\n"
         data_10 += f"API: {settings.PREFIX}sayd <訊息>\n"
         data_10 += f"說明: 偽裝{settings.BOT_NAME}發送訊息(刪除後發送)\n\n"
+        data_10 += f"API: {settings.PREFIX}限時 <1~1800> <訊息>\n"
+        data_10 += f"說明: 限時<1~1800>秒刪除訊息\n\n"
 
         data_10 += f"+ 管理者功能(需權限)\n"
-        data_10 += f"API: {settings.PREFIX}clean <數量>\n"
-        data_10 += f"說明: 清除<數量>條訊息\n"
+        data_10 += f"API: {settings.PREFIX}clean <1~200>\n"
+        data_10 += f"說明: 清除<1~200>條訊息\n"
+        data_10 += f"API: {settings.PREFIX}setting look\n"
+        data_10 += f"說明: 查看目前{settings.BOT_NAME}設定\n"
         data_10 += f"```"
         return data_10
 
