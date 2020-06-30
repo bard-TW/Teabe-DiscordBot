@@ -11,6 +11,8 @@ from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher
 import logging
 import time
 
+import asyncio
+
 logger = logging.getLogger('bot')
 
 
@@ -35,7 +37,12 @@ class Event(Cog_Extension):
                 guildConfig.save()
 
         if guildConfig.join_guild_cipher_is_valid:
-            pass
+            cipher = JoinGuildCipher.objects.get(guild_id=guild_id)
+            msgs = [cipher.msg1, cipher.msg2, cipher.msg3, cipher.msg4, cipher.msg5]
+            for msg in msgs:
+                if msg:
+                    await member.send(msg)
+                await asyncio.sleep(2)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
