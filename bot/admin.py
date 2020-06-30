@@ -27,7 +27,14 @@ admin.site.register(Info_guildNickname, Info_guildNicknameAdmin)
 
 
 class Info_guildConfigAdmin(admin.ModelAdmin):
-    list_display = ('guild_id', 'previou_is_valid', 'respond_is_valid', 'respond_only_guild')
+    list_display = ('guild_id', 'previou_is_valid', 'respond_is_valid', 'respond_only_guild', 'join_msg_is_valid', 
+                    'join_guild_msg_channel', 'leave_msg_is_valid', 'leave_guild_msg_channel', 'join_guild_cipher_is_valid')
+    fields = ['guild_id', 'previou_is_valid', 
+            ('respond_is_valid', 'respond_only_guild'), 
+            ('join_msg_is_valid', 'join_guild_msg_channel'), 
+            ('leave_msg_is_valid', 'leave_guild_msg_channel'), 
+            'join_guild_cipher_is_valid']  # django編輯的排版
+
 admin.site.register(Info_guildConfig, Info_guildConfigAdmin)
 
 

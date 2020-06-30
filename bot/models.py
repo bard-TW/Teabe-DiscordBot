@@ -51,13 +51,12 @@ class Info_guildConfig(models.Model):
     respond_only_guild = models.BooleanField(default=True, verbose_name='公會回應', help_text='只允許公會內教的')
 
     join_msg_is_valid = models.BooleanField(default=True, verbose_name='開啟進群通知', help_text='若無設定通知頻道有人進群時將自動關閉')
-    join_guild_msg_channel = models.IntegerField(verbose_name='進群的訊息頻道', help_text='設定進群通知頻道')
+    join_guild_msg_channel = models.IntegerField(null=True, verbose_name='進群的訊息頻道', help_text='設定進群通知頻道')
 
     leave_msg_is_valid = models.BooleanField(default=True, verbose_name='開啟離群通知', help_text='若無設定通知頻道有人離群時將自動關閉')
-    leave_guild_msg_channel = models.IntegerField(verbose_name='離群的訊息頻道', help_text='設定離群通知頻道')
+    leave_guild_msg_channel = models.IntegerField(null=True, verbose_name='離群的訊息頻道', help_text='設定離群通知頻道')
 
     join_guild_cipher_is_valid = models.BooleanField(default=True, verbose_name='開啟進群密語', help_text='若無設定進群密語時將自動關閉')
-    join_guild_cipher = models.ForeignKey(JoinGuildCipher, on_delete=models.CASCADE, blank=True, null=True, verbose_name='進群密語')
     def __str__(self):
         return self.guild_id.guild
 

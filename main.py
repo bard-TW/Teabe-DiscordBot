@@ -36,10 +36,6 @@ logger.info(f'Starting up django, pid: {p.pid}')
 logger.info('Starting up bot')
 bot = commands.Bot(command_prefix=settings.PREFIX)
 bot.remove_command('help')
-@bot.event
-async def on_ready():
-    logger.info('Logged in as %s, id: %s', bot.user.name, bot.user.id)
-    await bot.change_presence(activity=discord.Game(name=f"{settings.PREFIX}help"))
 
 @bot.command()
 async def load(ctx, extension):

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 TOKEN = config('TOKEN')
 BOT_NAME = config('BOT_NAME')
 HOLDER_ID = config('HOLDER_ID', cast=int)
+BOT_CIPHER_CHANNEL = config('HOLDER_ID', cast=int)
 
 # bot 前綴
 PREFIX = config('PREFIX', cast=str)

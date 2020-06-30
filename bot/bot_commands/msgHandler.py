@@ -7,6 +7,7 @@ from discord.ext.commands import UserConverter
 from django.conf import settings
 from bot.models import Info_guild, Info_author, Info_guildNickname, BotResponds, Info_guildConfig, BotHelloResponds
 from django.db.models import Count, F, Q, QuerySet, Max
+from django.core.exceptions import ObjectDoesNotExist
 
 import asyncio
 import random
@@ -28,14 +29,17 @@ class MsgHandler(Cog_Extension):
     async def on_message(self, msg):
         # 對機器人密語
         if type(msg.channel) == discord.channel.DMChannel and msg.author != self.bot.user:
-            channel = self.bot.get_channel(self.bot.user.id)
+            channel = self.bot.get_channel(settings.BOT_CIPHER_CHANNEL)
             send_msg = "{} {} 說：\n{}".format(msg.author.id, msg.author, msg.content)
             for attachment in msg.attachments:
                 send_msg += '\n{}'.format(attachment.url)
             logger.info(send_msg)
-            await channel.send(send_msg)
+            if channel:
+                await channel.send(send_msg)
 
         # 回話功能
+        if not msg.guild:
+            return
         guild_id = Info_guild.objects.get(guild_id=msg.guild.id)
         guildConfig = Info_guildConfig.objects.get(guild_id=guild_id)
         if (not msg.author.bot) and (guildConfig.respond_is_valid):
@@ -55,7 +59,6 @@ class MsgHandler(Cog_Extension):
                     responds = BotResponds.objects.filter(keyword=keyword)
                 if responds:
                     respond = random.choice(responds.values('respond'))['respond']
-
             else:
                 # 回最後一句
                 keyword = msg.content
@@ -95,18 +98,14 @@ class MsgHandler(Cog_Extension):
 
     @commands.command()
     async def 學(self, ctx, keyword, *arg):
+        if not ctx.guild:
+            await ctx.send('私人頻道無法使用此功能')
+            return
+
         if keyword[:2] != settings.BOT_NAME:
             if len(arg):
                 # 公會名稱更新
-                guild_data = Info_guild.objects.filter(guild_id=ctx.guild.id)
-                if guild_data:
-                    guild = guild_data.values()[0]['guild']
-                    if guild != str(ctx.guild):
-                        logger.info(f'update guild name: {guild} > {str(ctx.guild)}')
-                        guild_data.update(guild=str(ctx.guild))
-                else:
-                    Info_guild.objects.create(guild=str(ctx.guild), guild_id=ctx.guild.id)
-                    guild_data = Info_guild.objects.filter(guild_id=ctx.guild.id)
+                guild_data = Info_guild.objects.get(guild_id=ctx.guild.id)
 
                 # author名稱更新
                 author_data = Info_author.objects.filter(author_id=ctx.author.id)
@@ -145,6 +144,9 @@ class MsgHandler(Cog_Extension):
 
     @commands.command()
     async def 忘記(self, ctx, keyword=None, *arg):
+        if not ctx.guild:
+            await ctx.send('私人頻道無法使用此功能')
+            return
         if keyword:
             guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
             responds = BotResponds.objects.filter(keyword=keyword, guild_id=guild_id).last()
@@ -161,6 +163,9 @@ class MsgHandler(Cog_Extension):
 
     @commands.command()
     async def 忘記關鍵字(self, ctx, keyword=None, *arg):
+        if not ctx.guild:
+            await ctx.send('私人頻道無法使用此功能')
+            return
         if keyword:
             guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
             responds = BotResponds.objects.filter(keyword=keyword, guild_id=guild_id)
@@ -177,14 +182,15 @@ class MsgHandler(Cog_Extension):
 
     @commands.command()
     async def 學打招呼(self, ctx, *arg):
-        respond = " ".join(arg)
-        data = BotHelloResponds.objects.filter(respond=respond)
-        if not data:
-            BotHelloResponds.objects.create(respond=respond)
-            await ctx.message.add_reaction(settings.REACTION_SUCCESS)
-        else:
-            await ctx.send(f'{settings.BOT_NAME}已經會了！')
-            await ctx.message.add_reaction(settings.REACTION_FAILURE)
+        if ctx.author.id == settings.HOLDER_ID:
+            respond = " ".join(arg)
+            data = BotHelloResponds.objects.filter(respond=respond)
+            if not data:
+                BotHelloResponds.objects.create(respond=respond)
+                await ctx.message.add_reaction(settings.REACTION_SUCCESS)
+            else:
+                await ctx.send(f'{settings.BOT_NAME}已經會了！')
+                await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
     @commands.command()
     async def 回(self, ctx, toUser, *msg):
@@ -198,6 +204,9 @@ class MsgHandler(Cog_Extension):
 
     @commands.command()
     async def 查看清單(self, ctx, *arg):
+        if not ctx.guild:
+            await ctx.send('私人頻道無法使用此功能')
+            return
         data = {}
         if arg:
             author = await self.msg2author(arg)
