@@ -58,7 +58,7 @@ class Base(Cog_Extension):
         data_10 += f"API: {settings.PREFIX}限時 <1~1800> <訊息>\n"
         data_10 += f"說明: 限時<1~1800>秒刪除訊息\n\n"
 
-        data_10 += f"+ 管理者功能(需權限)\n"
+        data_10 += f"+ 管理者功能(需管理身份祖權限)\n"
         data_10 += f"API: {settings.PREFIX}clean <1~200>\n"
         data_10 += f"說明: 清除<1~200>條訊息\n"
         data_10 += f"API: {settings.PREFIX}setting look\n"

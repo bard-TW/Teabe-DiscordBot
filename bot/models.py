@@ -44,6 +44,16 @@ class JoinGuildCipher(models.Model):
     def __str__(self):
         return self.guild_id.guild
 
+class BotReactionRoles(models.Model):
+    guild_id = models.ForeignKey(Info_guild, on_delete=models.CASCADE, blank=True, null=True, verbose_name='伺服器')
+    msg_id = models.IntegerField(verbose_name='訊息代碼')
+    emoji_id = models.IntegerField(null=True, verbose_name='表情符號代碼')
+    emoji_name = models.CharField(max_length=5, null=True, verbose_name='表情符號名稱')
+    roles_id = models.IntegerField(verbose_name='權限代碼')
+    roles_name = models.CharField(max_length=100, null=True, verbose_name='權限名稱')
+    def __str__(self):
+        return self.guild_id.guild
+
 class Info_guildConfig(models.Model):
     guild_id = models.ForeignKey(Info_guild, on_delete=models.CASCADE, blank=True, null=True, verbose_name='伺服器')
     previou_is_valid = models.BooleanField(default=True, verbose_name='推齊', help_text='開啟推齊功能')

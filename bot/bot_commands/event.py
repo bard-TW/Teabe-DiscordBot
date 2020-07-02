@@ -4,15 +4,20 @@ from discord.ext import commands
 
 from bot.core.classes import Cog_Extension
 from django.conf import settings
+from django.db.models import Max
+from discord.errors import Forbidden
 
-from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher
+from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles
+from bot.core.cache import CACHE_REACTION_ROLE
+
 from discord.ext.commands import has_permissions, MissingPermissions
+
 # log
 import logging
 import time
 
 import asyncio
-
+import traceback
 logger = logging.getLogger('bot')
 
 
@@ -77,11 +82,21 @@ class Event(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        logger.info('Logged in as %s, id: %s, guild num: %s', self.bot.user.name, self.bot.user.id, len(self.bot.guilds))
+        logger.info('登入bot: %s, id: %s, 加入伺服器數量: %s', self.bot.user.name, self.bot.user.id, len(self.bot.guilds))
         
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{settings.PREFIX}help (測試版不定時刪資料庫)"))
         for guild in self.bot.guilds:
             await self.checkCreateData(guild)
+
+        # CACHE_REACTION_ROLE 快取
+        qs = (
+            BotReactionRoles.objects
+            .values('msg_id')
+            .annotate(max_id=Max('msg_id'))
+        )
+        if qs:
+            CACHE_REACTION_ROLE.extend(qs.values_list('msg_id', flat=True))
+            logger.info('反應快取數量: {}'.format(len(CACHE_REACTION_ROLE)))
 
     async def checkCreateData(self, guild):
         guild_data = Info_guild.objects.filter(guild_id=guild.id)
@@ -103,9 +118,46 @@ class Event(Cog_Extension):
             JoinGuildCipher.objects.create(guild_id=guild_data[0])
 
     @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        if payload.message_id in CACHE_REACTION_ROLE:
+            # 加入表情反應
+            guild_id = Info_guild.objects.get(guild_id=payload.guild_id)
+            if payload.emoji.id:
+                reaction = BotReactionRoles.objects.filter(guild_id=guild_id, msg_id=payload.message_id, emoji_id=payload.emoji.id)
+            else:
+                reaction = BotReactionRoles.objects.filter(guild_id=guild_id, msg_id=payload.message_id, emoji_name=payload.emoji.name)
+            if reaction:
+                guild = self.bot.get_guild(payload.guild_id)
+                member = guild.get_member(payload.user_id)
+                for rea in reaction:
+                    role = discord.utils.get(guild.roles, id=rea.roles_id)
+                    await member.add_roles(role)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        # 解除表情反應
+        if payload.message_id in CACHE_REACTION_ROLE:
+            guild_id = Info_guild.objects.get(guild_id=payload.guild_id)
+            if payload.emoji.id:
+                reaction = BotReactionRoles.objects.filter(guild_id=guild_id, msg_id=payload.message_id, emoji_id=payload.emoji.id)
+            else:
+                reaction = BotReactionRoles.objects.filter(guild_id=guild_id, msg_id=payload.message_id, emoji_name=payload.emoji.name)
+
+            if reaction:
+                guild = self.bot.get_guild(payload.guild_id)
+                member = guild.get_member(payload.user_id)
+                for rea in reaction:
+                    role = discord.utils.get(guild.roles, id=rea.roles_id)
+                    await member.remove_roles(role)
+
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, MissingPermissions):
             await ctx.send('您缺少權限！')
+        else:
+            print(traceback.format_exc())
+        await ctx.message.add_reaction(settings.REACTION_FAILURE)
+
 
 def setup(bot):
     bot.add_cog(Event(bot))

@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 CACHE_REACTION = {}
+CACHE_REACTION_ROLE = [] # 存放有反應權限的訊息ID
 
 class Reaction(object):
     title = ''  # 標題

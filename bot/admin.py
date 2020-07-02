@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds, JoinGuildCipher
+from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds, JoinGuildCipher, BotReactionRoles
 # Register your models here.
 
 
@@ -46,3 +46,9 @@ class JoinGuildCipherAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'msg1', 'msg2', 'msg3', 'msg4', 'msg5')
 
 admin.site.register(JoinGuildCipher, JoinGuildCipherAdmin)
+
+class BotReactionRolesAdmin(admin.ModelAdmin):
+    list_display = ('guild_id', 'msg_id', 'emoji_id', 'emoji_name', 'roles_id', 'roles_name')
+    list_filter = ('guild_id',)  # 塞選條件
+
+admin.site.register(BotReactionRoles, BotReactionRolesAdmin)
