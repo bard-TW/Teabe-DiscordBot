@@ -38,9 +38,9 @@ class Base(Cog_Extension):
         data_1 += f"+ {settings.BOT_NAME}查看指令\n"
         data_1 += f"API: {settings.PREFIX}查看清單 <空白\\@標記使用者>\n"
         data_1 += f"說明: 查看伺服器\\使用者有教哪些關鍵字\n"
-        data_1 += f"API: {settings.PREFIX}查看關鍵字 <關鍵字>\n\n"
+        data_1 += f"API: {settings.PREFIX}查看關鍵字 <關鍵字>\n"
+        data_1 += f"說明: 查看關鍵字內使用者教了有哪些回應\n\n"
 
-        data_1 += f"說明: 查看關鍵字內使用者教了有哪些回應\n"
         data_1 += f"+ {settings.BOT_NAME}忘記指令\n"
         data_1 += f"API: {settings.PREFIX}忘記 <關鍵字>\n"
         data_1 += f"說明: 忘記關鍵字內的最後一個回應\n"
@@ -117,21 +117,23 @@ class Base(Cog_Extension):
             settings.REACTION_10: 10,
             }
         data_dict = {
-            0: await self.getData_0(ctx),
-            1: await self.getData_1(ctx),
-            9: await self.getData_9(ctx),
-            10: await self.getData_10(ctx)
+            0: self.getData_0,
+            1: self.getData_1,
+            9: self.getData_9,
+            10: self.getData_10
         }
         if ctx.author.id == settings.HOLDER_ID:
             #持有者特殊功能
             buttonActionDict[settings.REACTION_ADMIN] =  99
-            data_dict[99] = await self.getData_99(ctx)
+            data_dict[99] = self.getData_99
 
         reaction = Reaction()
         reaction.data_dict = data_dict
+        reaction.ctx = ctx
         reaction.buttonActionDict = buttonActionDict
 
-        message = await ctx.send(data_dict[0])
+        message = await ctx.send(await data_dict[0](ctx))
+
         reaction.msg = message
         CACHE_REACTION[message.id] = reaction
 

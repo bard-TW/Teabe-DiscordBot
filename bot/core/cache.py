@@ -17,6 +17,7 @@ class Reaction(object):
     data_dict = dict() # 按鈕作用對應字典文字
     page = int()  # 頁數
     buttonActionDict = dict()  # 按鈕作用
+    ctx = None # 上下文
     def __init__(self,):
         self.time = datetime.now()
 
@@ -46,5 +47,7 @@ class Reaction(object):
             num = 0
         if num != None and num != self.page:
             self.page = num
-            return self.data_dict.get(num)
-        return None
+            fun = self.data_dict.get(num)
+            if fun:
+                return fun, self.ctx
+        return None, None

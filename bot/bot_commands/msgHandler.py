@@ -319,7 +319,10 @@ class MsgHandler(Cog_Extension):
                     await reaction.message.edit(embed=embed)
                     rea.time=datetime.now()
             elif rea and rea.data_dict:
-                data = rea.makeQueryDict(str(reaction))
+                fun, ctx = rea.makeQueryDict(str(reaction))
+                data = None
+                if fun and ctx:
+                    data = await fun(ctx)
                 if data:
                     await reaction.message.edit(content=data)
                     rea.time=datetime.now()

@@ -4,7 +4,7 @@ from discord.ext import commands
 from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles, Info_roles, BotPermissionRoles
 
 from bot.core.classes import Cog_Extension
-from bot.core.cache import CACHE_REACTION_ROLE
+from bot.core.cache import CACHE_REACTION_ROLE, CACHE_REACTION, Reaction
 from django.db.models import Count, F, Q, QuerySet, Max
 from django.conf import settings
 
@@ -38,50 +38,112 @@ class Setting(Cog_Extension):
     @commands.group()
     @has_permissions(manage_roles=True)
     async def setting(self, ctx):
-        guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
-        ctx.guildConfig = Info_guildConfig.objects.get(guild_id=guild_id)
+        ctx.guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
+        ctx.guildConfig = Info_guildConfig.objects.get(guild_id=ctx.guild_id)
+
+    async def getData_0(self, ctx):
+        # 目錄頁
+        data_0 = f"<目錄頁> 管理{settings.BOT_NAME}小幫手～\n"
+        data_0 += f"```diff\n"
+        data_0 += f"- 點擊下方反應會出現相對應說明\n"
+        data_0 += f"注意: 指令跟參數和參數跟參數中間，皆需要有空白。\n\n"
+        data_0 += f"+ {settings.REACTION_0} >> 回目錄\n"
+        data_0 += f"+ {settings.REACTION_1} >> 基本設定\n"
+        data_0 += f"+ {settings.REACTION_2} >> 進群密語\n"
+        data_0 += f"+ {settings.REACTION_3} >> 反應權限\n"
+        data_0 += f"+ {settings.REACTION_3} >> 權限賦予身份組\n"
+        data_0 += f"\n- 注意：{settings.BOT_NAME}退出群組後將移除此伺服器的所有設定\n"
+        data_0 += f"```"
+        return data_0
+
+    async def getData_1(self, ctx):
+        # 基本設定
+        ctx.guildConfig = Info_guildConfig.objects.get(guild_id=ctx.guild_id)
+        data_1 = f"<基本設定> 管理{settings.BOT_NAME}小幫手～\n"
+        data_1 += f"```diff\n"
+        data_1 += f"下方功能狀態 0:關閉 1:開啟 下指令可控制開關\n"
+        data_1 += f"開關推齊範例: {settings.PREFIX}setting previou_is_valid\n"
+        data_1 += f"設置進群(離群)通知頻道在要設置的頻道內相同的方式輸入，即可設置\n\n"
+        data_1 += f"+ 功能狀態\n"
+        data_1 += f"- 以下指令最前面需打 {settings.PREFIX}setting\n"
+        data_1 += f"previou_is_valid (推齊功能): {int(ctx.guildConfig.previou_is_valid)}\n"
+        data_1 += f"respond_is_valid (回應): {int(ctx.guildConfig.respond_is_valid)}\n"
+        data_1 += f"respond_only_guild (只說伺服器內教的): {int(ctx.guildConfig.respond_only_guild)}\n\n"
+        join_guild_msg_channel_name = self.bot.get_channel(ctx.guildConfig.join_guild_msg_channel)
+        leave_guild_msg_channel_name = self.bot.get_channel(ctx.guildConfig.leave_guild_msg_channel)
+        join_guild_msg_channel_name = join_guild_msg_channel_name if join_guild_msg_channel_name else ''
+        leave_guild_msg_channel_name = leave_guild_msg_channel_name if leave_guild_msg_channel_name else ''
+        data_1 += f"join_msg_is_valid (開啟進群通知): {int(ctx.guildConfig.join_msg_is_valid)}\n"
+        data_1 += f"join_guild_msg_channel (進群的訊息頻道): {join_guild_msg_channel_name}\n\n"
+        data_1 += f"leave_msg_is_valid (開啟離群通知): {int(ctx.guildConfig.join_msg_is_valid)}\n"
+        data_1 += f"leave_guild_msg_channel (離群的訊息頻道): {leave_guild_msg_channel_name}\n\n"
+        data_1 += f"join_guild_cipher_is_valid (開啟進群密語): {int(ctx.guildConfig.join_guild_cipher_is_valid)}\n\n"
+        data_1 += f"```"
+        return data_1
+
+    async def getData_2(self, ctx):
+        # 進群密語
+        data_2 = f"<進群密語> 管理{settings.BOT_NAME}小幫手～\n"
+        data_2 += f"```diff\n"
+        data_2 += f"+ 進群密語 (使用者進群後的使用者密語通知訊息)\n"
+        data_2 += f"- 以下指令最前面需打 {settings.PREFIX}cipher\n"
+        data_2 += f"test (進群密語測試)\n"
+        data_2 += f"modify <1~5> <訊息> (進群密語修改 訊息)\n\n"
+        data_2 += f"```"
+        return data_2
+
+    async def getData_3(self, ctx):
+        # 進群密語
+        data_3 = f"<反應權限> 管理{settings.BOT_NAME}小幫手～\n"
+        data_3 += f"```diff\n"
+        data_3 += f"+ 反應權限 (點擊反應後可以獲得身份組)\n"
+        data_3 += f"- 以下指令最前面需打 {settings.PREFIX}reaction\n"
+        data_3 += f"look (查看目前所設定的反應權限)\n"
+        data_3 += f"add <訊息ID> <反應> <身份組名稱> <反應> <身份組名稱> (反應和權限名稱可一次新增多個)\n"
+        data_3 += f"remove <訊息ID> (刪除訊息ID裡的全部反應權限))\n\n"
+        data_3 += f"```"
+        return data_3
+
+    async def getData_4(self, ctx):
+        # 權限賦予身份組
+        data_4 = f"<權限賦予身份組> 管理{settings.BOT_NAME}小幫手～\n"
+        data_4 += f"```diff\n"
+        data_4 += f"+ 權限賦予身份組 (設定可以用打指令的方式賦予身份組)\n"
+        data_4 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n"
+        data_4 += f"look (查看目前所設定的權限賦予身份組)\n"
+        data_4 += f"add <擁有身份組名稱> <賦予身份組名稱> <賦予身份組名稱> (新增權限賦予身份組))\n"
+        data_4 += f"remove <擁有身份組名稱> (移除擁有身份組名稱裡全部設定))\n"
+        data_4 += f"```"
+        return data_4
 
     @setting.command()
     async def look(self, ctx):
-        if ctx.guild:
-            data = f"{settings.BOT_NAME}伺服器設定查看\n```diff\n"
-            data += f"+ 使用介紹\n"
-            data += f"下方功能狀態 0:關閉 1:開啟 下指令可控制開關\n"
-            data += f"開關推齊範例: {settings.PREFIX}setting previou_is_valid\n"
-            data += f"設置進群(離群)通知頻道在要設置的頻道內相同的方式輸入，即可設置\n\n"
-            data += f"+ 功能狀態\n"
-            data += f"- 以下指令最前面需打 {settings.PREFIX}setting\n"
-            data += f"previou_is_valid (推齊功能): {int(ctx.guildConfig.previou_is_valid)}\n"
-            data += f"respond_is_valid (回應): {int(ctx.guildConfig.respond_is_valid)}\n"
-            data += f"respond_only_guild (只說伺服器內教的): {int(ctx.guildConfig.respond_only_guild)}\n"
-            join_guild_msg_channel_name = self.bot.get_channel(ctx.guildConfig.join_guild_msg_channel)
-            leave_guild_msg_channel_name = self.bot.get_channel(ctx.guildConfig.leave_guild_msg_channel)
-            join_guild_msg_channel_name = join_guild_msg_channel_name if join_guild_msg_channel_name else ''
-            leave_guild_msg_channel_name = leave_guild_msg_channel_name if leave_guild_msg_channel_name else ''
-            data += f"join_msg_is_valid (開啟進群通知): {int(ctx.guildConfig.join_msg_is_valid)}\n"
-            data += f"join_guild_msg_channel (進群的訊息頻道): {join_guild_msg_channel_name}\n"
-            data += f"leave_msg_is_valid (開啟離群通知): {int(ctx.guildConfig.join_msg_is_valid)}\n"
-            data += f"leave_guild_msg_channel (離群的訊息頻道): {leave_guild_msg_channel_name}\n"
-            data += f"join_guild_cipher_is_valid (開啟進群密語): {int(ctx.guildConfig.join_guild_cipher_is_valid)}\n\n"
+        buttonActionDict = {
+            settings.REACTION_0: 0, 
+            settings.REACTION_1: 1,
+            settings.REACTION_2: 2,
+            settings.REACTION_3: 3,
+            settings.REACTION_4: 4,
+            }
+        data_dict = {
+            0: self.getData_0,
+            1: self.getData_1,
+            2: self.getData_2,
+            3: self.getData_3,
+            4: self.getData_4,
+        }
+        reaction = Reaction()
+        reaction.data_dict = data_dict
+        reaction.ctx = ctx
+        reaction.buttonActionDict = buttonActionDict
+        message = await ctx.send(await data_dict[0](ctx))
 
-            data += f"+ 進群密語 (使用者進群後的使用者密語通知訊息)\n"
-            data += f"- 以下指令最前面需打 {settings.PREFIX}cipher\n"
-            data += f"test (進群密語測試)\n"
-            data += f"modify <1~5> <訊息> (進群密語修改 訊息)\n\n"
+        reaction.msg = message
+        CACHE_REACTION[message.id] = reaction
 
-            data += f"+ 反應權限 (點擊反應後可以獲得身份組)\n"
-            data += f"- 以下指令最前面需打 {settings.PREFIX}reaction\n"
-            data += f"look (查看目前所設定的反應權限)\n"
-            data += f"add <訊息ID> <反應> <身份組名稱> <反應> <身份組名稱> (反應和權限名稱可一次新增多個)\n"
-            data += f"remove <訊息ID> (刪除訊息ID裡的全部反應權限))\n\n"
-
-            data += f"+ 權限賦予身份組 (設定可以用打指令的方式賦予身份組)\n"
-            data += f"- 以下指令最前面需打 {settings.PREFIX}permission\n"
-            data += f"look (查看目前所設定的權限賦予身份組)\n"
-            data += f"add <擁有身份組名稱> <賦予身份組名稱> <賦予身份組名稱> (新增權限賦予身份組))\n"
-            data += f"remove <擁有身份組名稱> (移除擁有身份組名稱裡全部設定))\n"
-            data += f"\n```"
-            await ctx.send(data)
+        for react in reaction.buttonActionDict.keys():
+            await message.add_reaction(react)
+        await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @setting.command()
     async def previou_is_valid(self, ctx):
@@ -193,7 +255,7 @@ class Cipher(Cog_Extension):
                 await ctx.send('請輸入1~5數字')
                 await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
-class Reaction(Cog_Extension):
+class ReactionRole(Cog_Extension):
     @commands.group()
     @has_permissions(manage_roles=True)
     async def reaction(self, ctx):
@@ -519,6 +581,6 @@ class Roles(Cog_Extension):
 def setup(bot):
     bot.add_cog(Setting(bot))
     bot.add_cog(Cipher(bot))
-    bot.add_cog(Reaction(bot))
+    bot.add_cog(ReactionRole(bot))
     bot.add_cog(Permission(bot))
     bot.add_cog(Roles(bot))
