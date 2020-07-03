@@ -77,7 +77,8 @@ class Event(Cog_Extension):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         # bot 離群
-        # TODO 移除所有guild有關的data
+        guild_data = Info_guild.objects.filter(guild_id=guild.id)
+        guild_data.delete()
         logger.info("{}, {}, {}".format('remove', guild, type(guild)))
 
     @commands.Cog.listener()
@@ -167,8 +168,8 @@ class Event(Cog_Extension):
             else:
                 await ctx.send('私人頻道無法使用此功能')
 
-        # if isinstance(error, CommandInvokeError):
-        #     await ctx.send(f'{settings.BOT_NAME}缺少權限qaq')
+        if isinstance(error, CommandInvokeError):
+            await ctx.send(f'{settings.BOT_NAME}缺少權限qaq')
 
         else:
             print(error, traceback.format_exc())

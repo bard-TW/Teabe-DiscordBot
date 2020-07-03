@@ -19,6 +19,7 @@ class Base(Cog_Extension):
         if ctx.author.id == settings.HOLDER_ID:
             #持有者特殊功能
             data_0 += f"+ {settings.REACTION_ADMIN} >> 持有者功能\n"
+        data_0 += f"\n- 注意：{settings.BOT_NAME}退出群組後將移除此伺服器的所有設定\n"
         data_0 += f"```"
         return data_0
     
