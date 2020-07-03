@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds, JoinGuildCipher, BotReactionRoles
+from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds, JoinGuildCipher, BotReactionRoles, Info_roles, BotPermissionRoles
 # Register your models here.
 
 
@@ -26,6 +26,10 @@ class Info_guildNicknameAdmin(admin.ModelAdmin):
 admin.site.register(Info_guildNickname, Info_guildNicknameAdmin)
 
 
+class Info_rolesAdmin(admin.ModelAdmin):
+    list_display = ('guild_id', 'roles_id', 'roles_name')
+admin.site.register(Info_roles, Info_rolesAdmin)
+
 class Info_guildConfigAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'previou_is_valid', 'respond_is_valid', 'respond_only_guild', 'join_msg_is_valid', 
                     'join_guild_msg_channel', 'leave_msg_is_valid', 'leave_guild_msg_channel', 'join_guild_cipher_is_valid')
@@ -34,7 +38,6 @@ class Info_guildConfigAdmin(admin.ModelAdmin):
             ('join_msg_is_valid', 'join_guild_msg_channel'), 
             ('leave_msg_is_valid', 'leave_guild_msg_channel'), 
             'join_guild_cipher_is_valid']  # django編輯的排版
-
 admin.site.register(Info_guildConfig, Info_guildConfigAdmin)
 
 
@@ -44,11 +47,14 @@ admin.site.register(BotHelloResponds, BoTHelloRespondsAdmin)
 
 class JoinGuildCipherAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'msg1', 'msg2', 'msg3', 'msg4', 'msg5')
-
 admin.site.register(JoinGuildCipher, JoinGuildCipherAdmin)
 
 class BotReactionRolesAdmin(admin.ModelAdmin):
-    list_display = ('guild_id', 'msg_id', 'emoji_id', 'emoji_name', 'roles_id', 'roles_name')
+    list_display = ('guild_id', 'msg_id', 'emoji_id', 'emoji_name', 'roles_id')
     list_filter = ('guild_id',)  # 塞選條件
-
 admin.site.register(BotReactionRoles, BotReactionRolesAdmin)
+
+class BotPermissionRolesAdmin(admin.ModelAdmin):
+    list_display = ('guild_id', 'permission', 'roles')
+    list_filter = ('guild_id',)  # 塞選條件
+admin.site.register(BotPermissionRoles, BotPermissionRolesAdmin)

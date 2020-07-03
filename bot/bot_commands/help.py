@@ -14,6 +14,7 @@ class Base(Cog_Extension):
         data_0 += f"注意: 指令跟參數和參數跟參數中間，皆需要有空白。\n\n"
         data_0 += f"+ {settings.REACTION_0} >> 回目錄\n"
         data_0 += f"+ {settings.REACTION_1} >> 說話功能\n"
+        data_0 += f"+ {settings.REACTION_9} >> 身份組功能\n"
         data_0 += f"+ {settings.REACTION_10} >> 管理者\\特殊功能\n"
         if ctx.author.id == settings.HOLDER_ID:
             #持有者特殊功能
@@ -26,12 +27,12 @@ class Base(Cog_Extension):
         data_1 += f"```diff\n"
         data_1 += f"+ {settings.BOT_NAME}學習指令\n"
         data_1 += f"API: {settings.PREFIX}學 <關鍵字> <回應1> <回應2> <回應N>\n"
-        data_1 += f"範例: {settings.PREFIX}學 無聊怎麼辦 打後7 打中4 打前6 打騎士 耍費 睡覺\n\n"
+        data_1 += f"範例: {settings.PREFIX}學 無聊怎麼辦 打騎士 耍廢 睡覺 看書\n\n"
 
         data_1 += f"觸發回 最後 回應:\n"
         data_1 += f"- ME: 無聊怎麼辦    {settings.BOT_NAME}: 睡覺\n"
         data_1 += f"觸發回 隨機 回應:\n"
-        data_1 += f"- ME: {settings.BOT_NAME}無聊怎麼辦    {settings.BOT_NAME}: 打後7\n\n"
+        data_1 += f"- ME: {settings.BOT_NAME}無聊怎麼辦    {settings.BOT_NAME}: 看書\n\n"
 
         data_1 += f"+ {settings.BOT_NAME}查看指令\n"
         data_1 += f"API: {settings.PREFIX}查看清單 <空白\\@標記使用者>\n"
@@ -46,6 +47,28 @@ class Base(Cog_Extension):
         data_1 += f"說明: 忘記關鍵字內的全部回應\n"
         data_1 += f"```"
         return data_1
+
+    async def getData_9(self, ctx):
+        data_9 = f"<身份組功能> {settings.BOT_NAME}小幫手～\n"
+        data_9 += f"```diff\n"
+
+        data_9 += f"+ 賦予身份組 (打指令的方式賦予身份組)\n"
+        data_9 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n\n"
+
+        data_9 += f"API: look\n"
+        data_9 += f"說明: 查看目前您可以變更其他人的身份組\n\n"
+
+        data_9 += f"API: add <@使用者(要標記到)> <新增身份組名稱> <新增身份組名稱>\n"
+        data_9 += f"說明: 新增使用者身份組，身份組名稱可多個\n\n"
+        
+        data_9 += f"API: remove <@使用者(要標記到)> <移除身份組名稱> <移除身份組名稱> \n"
+        data_9 += f"說明: 移除使用者身份組，身份組名稱可多個\n\n"
+
+        data_9 += f"API: change <@使用者(要標記到)> <新增身份組名稱> > <移除身份組名稱> \n"
+        data_9 += f"說明: 變更使用者身份組，身份組名稱可多個，新增移除中間需 > 符號\n\n"
+
+        data_9 += f"```"
+        return data_9
 
     async def getData_10(self, ctx):
         data_10 = f"<管理者\\特殊功能> {settings.BOT_NAME}小幫手～\n"
@@ -89,11 +112,13 @@ class Base(Cog_Extension):
         buttonActionDict = {
             settings.REACTION_0: 0, 
             settings.REACTION_1: 1,
+            settings.REACTION_9: 9,
             settings.REACTION_10: 10,
             }
         data_dict = {
             0: await self.getData_0(ctx),
             1: await self.getData_1(ctx),
+            9: await self.getData_9(ctx),
             10: await self.getData_10(ctx)
         }
         if ctx.author.id == settings.HOLDER_ID:

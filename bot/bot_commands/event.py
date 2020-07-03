@@ -7,10 +7,10 @@ from django.conf import settings
 from django.db.models import Max
 from discord.errors import Forbidden
 
-from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles
+from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles, Info_roles
 from bot.core.cache import CACHE_REACTION_ROLE
 
-from discord.ext.commands import has_permissions, MissingPermissions
+from discord.ext.commands import has_permissions, MissingPermissions, CommandInvokeError
 
 # log
 import logging
@@ -130,8 +130,12 @@ class Event(Cog_Extension):
                 guild = self.bot.get_guild(payload.guild_id)
                 member = guild.get_member(payload.user_id)
                 for rea in reaction:
-                    role = discord.utils.get(guild.roles, id=rea.roles_id)
-                    await member.add_roles(role)
+                    role = discord.utils.get(guild.roles, id=rea.roles_id.roles_id)
+                    if role:
+                        await member.add_roles(role)
+                    else:
+                        roles = Info_roles.objects.filter(guild_id=guild_id, roles_id=rea.roles_id.roles_id)
+                        roles.delete()
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -147,15 +151,27 @@ class Event(Cog_Extension):
                 guild = self.bot.get_guild(payload.guild_id)
                 member = guild.get_member(payload.user_id)
                 for rea in reaction:
-                    role = discord.utils.get(guild.roles, id=rea.roles_id)
-                    await member.remove_roles(role)
+                    role = discord.utils.get(guild.roles, id=rea.roles_id.roles_id)
+                    if role:
+                        await member.remove_roles(role)
+                    else:
+                        roles = Info_roles.objects.filter(guild_id=guild_id, roles_id=rea.roles_id.roles_id)
+                        roles.delete()
+
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, MissingPermissions):
-            await ctx.send('您缺少權限！')
+            if ctx.guild:
+                await ctx.send('您缺少權限！')
+            else:
+                await ctx.send('私人頻道無法使用此功能')
+
+        # if isinstance(error, CommandInvokeError):
+        #     await ctx.send(f'{settings.BOT_NAME}缺少權限qaq')
+
         else:
-            print(traceback.format_exc())
+            print(error, traceback.format_exc())
         await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
 

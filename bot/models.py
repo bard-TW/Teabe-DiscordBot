@@ -24,6 +24,13 @@ class Info_guildNickname(models.Model):
     def __str__(self):
         return self.nickname
 
+class Info_roles(models.Model):
+    guild_id = models.ForeignKey(Info_guild, on_delete=models.CASCADE, blank=True, null=True, verbose_name='伺服器')
+    roles_id = models.IntegerField(verbose_name='權限代碼')
+    roles_name = models.CharField(max_length=100, null=True, verbose_name='權限名稱')
+    def __str__(self):
+        return self.roles_name
+
 class BotResponds(models.Model):
     info_id = models.AutoField(primary_key=True)
     keyword = models.CharField(max_length=20, verbose_name='觸發關鍵字')
@@ -49,8 +56,14 @@ class BotReactionRoles(models.Model):
     msg_id = models.IntegerField(verbose_name='訊息代碼')
     emoji_id = models.IntegerField(null=True, verbose_name='表情符號代碼')
     emoji_name = models.CharField(max_length=5, null=True, verbose_name='表情符號名稱')
-    roles_id = models.IntegerField(verbose_name='權限代碼')
-    roles_name = models.CharField(max_length=100, null=True, verbose_name='權限名稱')
+    roles_id = models.ForeignKey(Info_roles, on_delete=models.CASCADE, blank=True, null=True, verbose_name='權限名稱')
+    def __str__(self):
+        return self.guild_id.guild
+
+class BotPermissionRoles(models.Model):
+    guild_id = models.ForeignKey(Info_guild, on_delete=models.CASCADE, blank=True, null=True, verbose_name='伺服器')
+    permission = models.ForeignKey(Info_roles, on_delete=models.CASCADE, blank=True, null=True, verbose_name='權限', related_name='permission')
+    roles = models.ForeignKey(Info_roles, on_delete=models.CASCADE, blank=True, null=True, verbose_name='身份組')
     def __str__(self):
         return self.guild_id.guild
 
