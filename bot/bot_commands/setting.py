@@ -51,7 +51,7 @@ class Setting(Cog_Extension):
         data_0 += f"+ {settings.REACTION_1} >> 基本設定\n"
         data_0 += f"+ {settings.REACTION_2} >> 進群密語\n"
         data_0 += f"+ {settings.REACTION_3} >> 反應權限\n"
-        data_0 += f"+ {settings.REACTION_3} >> 權限賦予身份組\n"
+        data_0 += f"+ {settings.REACTION_4} >> 權限賦予身份組\n"
         data_0 += f"\n- 注意：{settings.BOT_NAME}退出群組後將移除此伺服器的所有設定\n"
         data_0 += f"```"
         return data_0
@@ -67,8 +67,8 @@ class Setting(Cog_Extension):
         data_1 += f"+ 功能狀態\n"
         data_1 += f"- 以下指令最前面需打 {settings.PREFIX}setting\n"
         data_1 += f"previou_is_valid (推齊功能): {int(ctx.guildConfig.previou_is_valid)}\n"
-        data_1 += f"respond_is_valid (回應): {int(ctx.guildConfig.respond_is_valid)}\n"
-        data_1 += f"respond_only_guild (只說伺服器內教的): {int(ctx.guildConfig.respond_only_guild)}\n\n"
+        data_1 += f"respond_is_valid (回應,打招呼): {int(ctx.guildConfig.respond_is_valid)}\n"
+        data_1 += f"respond_only_guild (只說伺服器內教的回應): {int(ctx.guildConfig.respond_only_guild)}\n\n"
         join_guild_msg_channel_name = self.bot.get_channel(ctx.guildConfig.join_guild_msg_channel)
         leave_guild_msg_channel_name = self.bot.get_channel(ctx.guildConfig.leave_guild_msg_channel)
         join_guild_msg_channel_name = join_guild_msg_channel_name if join_guild_msg_channel_name else ''
@@ -87,8 +87,9 @@ class Setting(Cog_Extension):
         data_2 += f"```diff\n"
         data_2 += f"+ 進群密語 (使用者進群後的使用者密語通知訊息)\n"
         data_2 += f"- 以下指令最前面需打 {settings.PREFIX}cipher\n"
+        data_2 += f"look (查看目前的進群密語)\n"
         data_2 += f"test (進群密語測試)\n"
-        data_2 += f"modify <1~5> <訊息> (進群密語修改 訊息)\n\n"
+        data_2 += f"modify <1~5> <空\\訊息> (進群密語刪除\\修改訊息)\n\n"
         data_2 += f"```"
         return data_2
 
@@ -111,15 +112,15 @@ class Setting(Cog_Extension):
         data_4 += f"+ 權限賦予身份組 (設定可以用打指令的方式賦予身份組)\n"
         data_4 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n"
         data_4 += f"look (查看目前所設定的權限賦予身份組)\n"
-        data_4 += f"add <擁有身份組名稱> <賦予身份組名稱> <賦予身份組名稱> (新增權限賦予身份組))\n"
-        data_4 += f"remove <擁有身份組名稱> (移除擁有身份組名稱裡全部設定))\n"
+        data_4 += f"add <擁有身份組名稱> <賦予身份組名稱> <賦予身份組名稱> (新增權限賦予身份組)\n"
+        data_4 += f"remove <擁有身份組名稱> (移除擁有身份組名稱裡全部設定)\n"
         data_4 += f"```"
         return data_4
 
     @setting.command()
     async def look(self, ctx):
         buttonActionDict = {
-            settings.REACTION_0: 0, 
+            settings.REACTION_0: 0,
             settings.REACTION_1: 1,
             settings.REACTION_2: 2,
             settings.REACTION_3: 3,
@@ -231,7 +232,19 @@ class Cipher(Cog_Extension):
                 await asyncio.sleep(2)
 
     @cipher.command()
-    async def modify(self, ctx, num, *, msg):
+    async def look(self, ctx):
+        msg_str = '已設定的密語訊息:\n'
+
+        msgs = [ctx.cipher.msg1, ctx.cipher.msg2, ctx.cipher.msg3, ctx.cipher.msg4, ctx.cipher.msg5]
+        for i, msg in enumerate(msgs, 1):
+            if msg:
+                msg_str += '{}:\n> {}\n\n'.format(i, msg.replace("\n", "\n> "))
+            else:
+                msg_str += f'{i}:\n> --\n\n'
+        await ctx.send(msg_str)
+
+    @cipher.command()
+    async def modify(self, ctx, num, *, msg=None):
         if ctx.guild:
             try:
                 num = int(num)

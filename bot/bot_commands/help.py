@@ -14,6 +14,7 @@ class Base(Cog_Extension):
         data_0 += f"注意: 指令跟參數和參數跟參數中間，皆需要有空白。\n\n"
         data_0 += f"+ {settings.REACTION_0} >> 回目錄\n"
         data_0 += f"+ {settings.REACTION_1} >> 說話功能\n"
+        data_0 += f"+ {settings.REACTION_1} >> 隨機功能\n"
         data_0 += f"+ {settings.REACTION_9} >> 身份組功能\n"
         data_0 += f"+ {settings.REACTION_10} >> 管理者\\特殊功能\n"
         if ctx.author.id == settings.HOLDER_ID:
@@ -49,20 +50,48 @@ class Base(Cog_Extension):
         data_1 += f"```"
         return data_1
 
+    async def getData_2(self, ctx):
+        data_2 = f"<隨機功能> {settings.BOT_NAME}小幫手～\n"
+        data_2 += f"```diff\n"
+        data_2 += f"+ 瑪英小屋小鬼\n"
+        data_2 += f"API:{settings.PREFIX}骰子 <訊息>\n"
+        data_2 += f"說明：回應數字1~6\n"
+        data_2 += f"範例：{settings.PREFIX}骰子 滾動吧骰子\n\n"
+
+        data_2 += f"API:{settings.PREFIX}數字 <訊息>\n"
+        data_2 += f"說明：回應數字1~100\n"
+        data_2 += f"範例：{settings.PREFIX}數字 今天的幸運指數是？\n\n"
+
+        data_2 += f"API:{settings.PREFIX}抽獎 <獎品1> <獎品2> <獎品3>\n"
+        data_2 += f"說明：回應隨機獎品\n"
+        data_2 += f"範例：{settings.PREFIX}抽獎 馬利 凱雅拉 蓋聯\n\n"
+
+        data_2 += f"API:{settings.PREFIX}是否 <訊息>\n"
+        data_2 += f"範例：{settings.PREFIX}是否 我穿得帥嗎?\n\n"
+
+        data_2 += f"API:{settings.PREFIX}可以不可以 <訊息>\n"
+        data_2 += f"範例：{settings.PREFIX}可以不可以 可以強化武器嗎?\n\n"
+
+        data_2 += f"+ 疊塔\n"
+        data_2 += f"API:{settings.PREFIX}塔 <表情符號> <1~5>\n"
+        data_2 += f"API:{settings.PREFIX}進化塔 <表情符號> <1~20>\n"
+        data_2 += f"```"
+        return data_2
+
     async def getData_9(self, ctx):
         data_9 = f"<身份組功能> {settings.BOT_NAME}小幫手～\n"
         data_9 += f"```diff\n"
 
         data_9 += f"+ 賦予身份組 (打指令的方式賦予身份組)\n"
-        data_9 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n\n"
+        data_9 += f"- 以下指令最前面需打 {settings.PREFIX}roles\n\n"
 
         data_9 += f"API: look\n"
         data_9 += f"說明: 查看目前您可以變更其他人的身份組\n\n"
 
-        data_9 += f"API: add <@使用者(要標記到)> <新增身份組名稱> <新增身份組名稱>\n"
+        data_9 += f"API: add <@使用者(要標記到)> <新增身份組名稱>\n"
         data_9 += f"說明: 新增使用者身份組，身份組名稱可多個\n\n"
         
-        data_9 += f"API: remove <@使用者(要標記到)> <移除身份組名稱> <移除身份組名稱> \n"
+        data_9 += f"API: remove <@使用者(要標記到)> <移除身份組名稱>\n"
         data_9 += f"說明: 移除使用者身份組，身份組名稱可多個\n\n"
 
         data_9 += f"API: change <@使用者(要標記到)> <新增身份組名稱> > <移除身份組名稱> \n"
@@ -113,12 +142,14 @@ class Base(Cog_Extension):
         buttonActionDict = {
             settings.REACTION_0: 0, 
             settings.REACTION_1: 1,
+            settings.REACTION_2: 2,
             settings.REACTION_9: 9,
             settings.REACTION_10: 10,
             }
         data_dict = {
             0: self.getData_0,
             1: self.getData_1,
+            2: self.getData_2,
             9: self.getData_9,
             10: self.getData_10
         }

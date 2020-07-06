@@ -119,21 +119,21 @@ class MsgHandler(Cog_Extension):
                     author_data = Info_author.objects.filter(author_id=ctx.author.id)
 
                 # 公會暱稱更新
-                nickname_data = Info_guildNickname.objects.filter(guild_id=guild_data[0], author_id=author_data[0])
+                nickname_data = Info_guildNickname.objects.filter(guild_id=guild_data, author_id=author_data[0])
                 if nickname_data:
                     nickname = nickname_data.values()[0]['nickname']
                     if nickname != str(ctx.author.display_name):
                         logger.info(f'update nickname: {nickname} > {str(ctx.author.display_name)}')
                         nickname_data.update(nickname=ctx.author.display_name)
                 else:
-                    Info_guildNickname.objects.create(guild_id=guild_data[0], author_id=author_data[0], nickname=ctx.author.display_name)
-                    nickname_data = Info_guildNickname.objects.filter(guild_id=guild_data[0], author_id=author_data[0])
+                    Info_guildNickname.objects.create(guild_id=guild_data, author_id=author_data[0], nickname=ctx.author.display_name)
+                    nickname_data = Info_guildNickname.objects.filter(guild_id=guild_data, author_id=author_data[0])
 
                 # 回應更新
                 for respond in arg:
-                    botResponds_data = BotResponds.objects.filter(keyword=keyword, guild_id=guild_data[0], author_id=author_data[0], respond=respond)
+                    botResponds_data = BotResponds.objects.filter(keyword=keyword, guild_id=guild_data, author_id=author_data[0], respond=respond)
                     if not botResponds_data:
-                        BotResponds.objects.create(keyword=keyword, guild_id=guild_data[0], author_id=author_data[0], respond=respond)
+                        BotResponds.objects.create(keyword=keyword, guild_id=guild_data, author_id=author_data[0], respond=respond)
                         await ctx.message.add_reaction(settings.REACTION_SUCCESS)
             else:
                 await ctx.message.add_reaction(settings.REACTION_FAILURE)

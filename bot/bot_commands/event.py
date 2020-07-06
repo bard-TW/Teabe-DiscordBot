@@ -85,7 +85,7 @@ class Event(Cog_Extension):
     async def on_ready(self):
         logger.info('登入bot: %s, id: %s, 加入伺服器數量: %s', self.bot.user.name, self.bot.user.id, len(self.bot.guilds))
         
-        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{settings.PREFIX}help (測試版不定時刪資料庫)"))
+        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{settings.PREFIX}help"))
         for guild in self.bot.guilds:
             await self.checkCreateData(guild)
 
@@ -167,13 +167,15 @@ class Event(Cog_Extension):
                 await ctx.send('您缺少權限！')
             else:
                 await ctx.send('私人頻道無法使用此功能')
+            await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
-        if isinstance(error, CommandInvokeError):
-            await ctx.send(f'{settings.BOT_NAME}缺少權限qaq')
+        # if isinstance(error, CommandInvokeError):
+        #     await ctx.send(f'{settings.BOT_NAME}缺少權限qaq')
+        #     await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
         else:
             print(error, traceback.format_exc())
-        await ctx.message.add_reaction(settings.REACTION_FAILURE)
+        
 
 
 def setup(bot):
