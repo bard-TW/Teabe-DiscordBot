@@ -45,20 +45,31 @@ class Base(Cog_Extension):
             await ctx.send(f'{settings.BOT_NAME}沒有權限刪除 QAQ')
 
     @commands.command()
-    async def change_presence(self, ctx, status=0, *, msg=None):
+    async def change_presence(self, ctx, status_str='', activity_str='', *, msg=None):
         # TODO 需在改良
         if ctx.author.id == settings.HOLDER_ID:
-            if status:
-                if int(status)==1:
-                    await self.bot.change_presence(status=discord.Status.offline)
-                elif int(status)==2:
-                    await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(name=msg))
-                elif int(status)==3:
-                    await self.bot.change_presence(status=discord.Status.dnd, activity=discord.Game(name=msg))
-                else:
-                    await self.bot.change_presence(status=discord.Status.online, activity=discord.Game(name=msg))
-            else:
-                await self.bot.change_presence(status=discord.Status.online, activity=discord.Game(name=f"{settings.PREFIX}help"))
+            status = discord.Status.online
+            if status_str == '上線':
+                status = discord.Status.online
+            elif status_str == '閒置':
+                status = discord.Status.idle
+            elif status_str == '忙碌':
+                status = discord.Status.dnd
+            elif status_str == '隱形':
+                status = discord.Status.offline
+
+            activity = discord.ActivityType.listening
+            if activity_str == '音樂':
+                activity = discord.ActivityType.listening
+            elif activity_str == '遊戲':
+                activity = discord.ActivityType.playing
+            elif activity_str == '影片':
+                activity = discord.ActivityType.watching
+
+            if not msg:
+                msg = f'{settings.PREFIX}help'
+
+            await self.bot.change_presence(status=status, activity=discord.Activity(type=activity, name=msg))
 
 
 def setup(bot):

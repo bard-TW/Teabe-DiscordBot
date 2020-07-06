@@ -128,9 +128,9 @@ class Base(Cog_Extension):
         data_99 += f"API: {settings.PREFIX}unload <模塊>\n"
         data_99 += f"API: {settings.PREFIX}reload <模塊>\n\n"
 
-        data_99 += f"+ {settings.BOT_NAME}change_presence\n"
-        data_99 += f"API: {settings.PREFIX}change_presence <0~3> <訊息>\n"
-        data_99 += f"說明: 0:預設, 1:下線, 2:閒置, 3:忙碌 正在玩的訊息\n\n"
+        data_99 += f"\n{settings.BOT_NAME}的狀態"
+        data_99 += f"API: {settings.PREFIX}change_presence <狀態> <動作> <訊息>\n"
+        data_99 += f"說明: 狀態可選<上線/閒置/忙碌/隱形>，動作可選<音樂/遊戲/影片>\n\n"
 
         data_99 += f"+ {settings.BOT_NAME}學打招呼\n"
         data_99 += f"API: {settings.PREFIX}學打招呼 <訊息>\n"
