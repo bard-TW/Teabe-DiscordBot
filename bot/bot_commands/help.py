@@ -14,9 +14,10 @@ class Base(Cog_Extension):
         data_0 += f"注意: 指令跟參數和參數跟參數中間，皆需要有空白。\n\n"
         data_0 += f"+ {settings.REACTION_0} >> 回目錄\n"
         data_0 += f"+ {settings.REACTION_1} >> 說話功能\n"
-        data_0 += f"+ {settings.REACTION_1} >> 隨機功能\n"
+        data_0 += f"+ {settings.REACTION_2} >> 隨機功能\n"
         data_0 += f"+ {settings.REACTION_9} >> 身份組功能\n"
         data_0 += f"+ {settings.REACTION_10} >> 管理者\\特殊功能\n"
+        data_0 += f"+ {settings.REACTION_NEW} >> 新功能介紹(假如有跳出來)\n"
         if ctx.author.id == settings.HOLDER_ID:
             #持有者特殊功能
             data_0 += f"+ {settings.REACTION_ADMIN} >> 持有者功能\n"
@@ -119,6 +120,13 @@ class Base(Cog_Extension):
         data_10 += f"```"
         return data_10
 
+    async def getData_new(self, ctx):
+        data_new = f"<新功能介紹> {settings.BOT_NAME}小幫手～\n"
+        data_new += f"```diff\n"
+        data_new += f"無新功能～"
+        data_new += f"```"
+        return data_new
+
     async def getData_99(self, ctx):
         #持有者特殊功能
         data_99 = f"<持有者功能> {settings.BOT_NAME}小幫手～\n"
@@ -132,8 +140,12 @@ class Base(Cog_Extension):
         data_99 += f"API: {settings.PREFIX}change_presence <狀態> <動作> <訊息>\n"
         data_99 += f"說明: 狀態可選<上線/閒置/忙碌/隱形>，動作可選<音樂/遊戲/影片>\n\n"
 
-        data_99 += f"+ {settings.BOT_NAME}學打招呼\n"
+        data_99 += f"+ {settings.BOT_NAME}打招呼\n"
         data_99 += f"API: {settings.PREFIX}學打招呼 <訊息>\n"
+
+        data_99 += f"+ {settings.BOT_NAME}密語\n"
+        data_99 += f"API: {settings.PREFIX}回 <使用者ID> <訊息>\n"
+        data_99 += f"說明: 使用{settings.BOT_NAME}跟使用這密語對話\n\n"
         data_99 += f"```"
         return data_99
 
@@ -145,13 +157,15 @@ class Base(Cog_Extension):
             settings.REACTION_2: 2,
             settings.REACTION_9: 9,
             settings.REACTION_10: 10,
+            # settings.REACTION_NEW: 11,
             }
         data_dict = {
             0: self.getData_0,
             1: self.getData_1,
             2: self.getData_2,
             9: self.getData_9,
-            10: self.getData_10
+            10: self.getData_10,
+            # 11: self.getData_new,
         }
         if ctx.author.id == settings.HOLDER_ID:
             #持有者特殊功能

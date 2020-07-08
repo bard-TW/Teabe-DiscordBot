@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 TOKEN = config('TOKEN')
 BOT_NAME = config('BOT_NAME')
 HOLDER_ID = config('HOLDER_ID', cast=int)
-BOT_CIPHER_CHANNEL = config('HOLDER_ID', cast=int)
+BOT_CIPHER_CHANNEL = config('BOT_CIPHER_CHANNEL', cast=int)
 
 # bot 前綴
 PREFIX = config('PREFIX', cast=str)
@@ -60,6 +60,7 @@ REACTION_7 = '7️⃣'
 REACTION_8 = '8️⃣'
 REACTION_9 = '9️⃣'
 REACTION_10 = '🔟'
+REACTION_NEW = '🐇'
 REACTION_ADMIN = '🔓'
 
 

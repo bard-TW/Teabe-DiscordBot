@@ -46,7 +46,6 @@ class Base(Cog_Extension):
 
     @commands.command()
     async def change_presence(self, ctx, status_str='', activity_str='', *, msg=None):
-        # TODO 需在改良
         if ctx.author.id == settings.HOLDER_ID:
             status = discord.Status.online
             if status_str == '上線':

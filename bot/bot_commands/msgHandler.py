@@ -195,12 +195,13 @@ class MsgHandler(Cog_Extension):
     @commands.command()
     async def 回(self, ctx, toUser, *msg):
         # 機器人回話
-        member = await UserConverter().convert(ctx, toUser)
-        send_msg = ''.join(msg)
-        for attachment in ctx.message.attachments:
-            send_msg += '\n{}'.format(attachment.url)
-        await member.send(send_msg)
-        await ctx.message.add_reaction(settings.REACTION_SUCCESS)
+        if ctx.author.id == settings.HOLDER_ID:
+            member = await UserConverter().convert(ctx, toUser)
+            send_msg = ''.join(msg)
+            for attachment in ctx.message.attachments:
+                send_msg += '\n{}'.format(attachment.url)
+            await member.send(send_msg)
+            await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
     @commands.command()
     async def 查看清單(self, ctx, *arg):
