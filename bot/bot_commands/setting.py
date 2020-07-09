@@ -1,13 +1,13 @@
 import discord
 from discord.ext import commands
 
-from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles, Info_roles, BotPermissionRoles
+from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles, Info_roles, BotPermissionRoles, BotBlocklist
 
 from bot.core.classes import Cog_Extension
 from bot.core.cache import CACHE_REACTION_ROLE, CACHE_REACTION, Reaction
 from django.db.models import Count, F, Q, QuerySet, Max
 from django.conf import settings
-
+from django.utils import timezone
 import re
 
 from discord.ext.commands import has_permissions, MemberConverter
@@ -45,14 +45,15 @@ class Setting(Cog_Extension):
         # 目錄頁
         data_0 = f"<目錄頁> 管理{settings.BOT_NAME}小幫手～\n"
         data_0 += f"```diff\n"
-        data_0 += f"- 點擊下方反應會出現相對應說明\n"
-        data_0 += f"注意: 指令跟參數和參數跟參數中間，皆需要有空白。\n\n"
+        data_0 += f"- 點擊下方反應會出現相對應說明\n\n"
         data_0 += f"+ {settings.REACTION_0} >> 回目錄\n"
         data_0 += f"+ {settings.REACTION_1} >> 基本設定\n"
         data_0 += f"+ {settings.REACTION_2} >> 進群密語\n"
         data_0 += f"+ {settings.REACTION_3} >> 反應權限\n"
         data_0 += f"+ {settings.REACTION_4} >> 權限賦予身份組\n"
-        data_0 += f"\n- 注意：{settings.BOT_NAME}退出群組後將移除此伺服器的所有設定\n"
+        data_0 += f"+ {settings.REACTION_5} >> 阻擋名單(黑名單)\n"
+        data_0 += f"\n- 注意: 指令跟參數和參數跟參數中間，皆需要有空白。\n"
+        data_0 += f"- 注意：{settings.BOT_NAME}退出群組後將移除此伺服器的所有設定\n"
         data_0 += f"```"
         return data_0
 
@@ -61,11 +62,11 @@ class Setting(Cog_Extension):
         ctx.guildConfig = Info_guildConfig.objects.get(guild_id=ctx.guild_id)
         data_1 = f"<基本設定> 管理{settings.BOT_NAME}小幫手～\n"
         data_1 += f"```diff\n"
-        data_1 += f"下方功能狀態 0:關閉 1:開啟 下指令可控制開關\n"
+        data_1 += f"+ 下方功能狀態 0:關閉 1:開啟 下指令可控制開關\n"
         data_1 += f"開關推齊範例: {settings.PREFIX}setting previou_is_valid\n"
-        data_1 += f"設置進群(離群)通知頻道在要設置的頻道內相同的方式輸入，即可設置\n\n"
-        data_1 += f"+ 功能狀態\n"
-        data_1 += f"- 以下指令最前面需打 {settings.PREFIX}setting\n"
+        data_1 += f"設置進群(離群)通知頻道在要設置的頻道內相同的方式輸入，即可設置\n"
+        data_1 += f"- 以下指令最前面需打 {settings.PREFIX}setting\n\n"
+
         data_1 += f"previou_is_valid (推齊功能): {int(ctx.guildConfig.previou_is_valid)}\n"
         data_1 += f"respond_is_valid (回應,打招呼): {int(ctx.guildConfig.respond_is_valid)}\n"
         data_1 += f"respond_only_guild (只說伺服器內教的回應): {int(ctx.guildConfig.respond_only_guild)}\n\n"
@@ -85,11 +86,14 @@ class Setting(Cog_Extension):
         # 進群密語
         data_2 = f"<進群密語> 管理{settings.BOT_NAME}小幫手～\n"
         data_2 += f"```diff\n"
-        data_2 += f"+ 進群密語 (使用者進群後的使用者密語通知訊息)\n"
-        data_2 += f"- 以下指令最前面需打 {settings.PREFIX}cipher\n"
-        data_2 += f"look (查看目前的進群密語)\n"
-        data_2 += f"test (進群密語測試)\n"
-        data_2 += f"modify <1~5> <空\\訊息> (進群密語刪除\\修改訊息)\n\n"
+        data_2 += f"+ 使用者進群後的使用者密語通知訊息\n"
+        data_2 += f"- 以下指令最前面需打 {settings.PREFIX}cipher\n\n"
+        data_2 += f"API: look\n"
+        data_2 += f"說明: 查看目前的進群密語\n"
+        data_2 += f"API: test\n"
+        data_2 += f"說明: 進群密語測試\n"
+        data_2 += f"API: modify <1~5> <空\\訊息>\n"
+        data_2 += f"說明: 進群密語刪除\\修改訊息\n"
         data_2 += f"```"
         return data_2
 
@@ -97,11 +101,14 @@ class Setting(Cog_Extension):
         # 進群密語
         data_3 = f"<反應權限> 管理{settings.BOT_NAME}小幫手～\n"
         data_3 += f"```diff\n"
-        data_3 += f"+ 反應權限 (點擊反應後可以獲得身份組)\n"
-        data_3 += f"- 以下指令最前面需打 {settings.PREFIX}reaction\n"
-        data_3 += f"look (查看目前所設定的反應權限)\n"
-        data_3 += f"add <訊息ID> <反應> <身份組名稱> <反應> <身份組名稱> (反應和權限名稱可一次新增多個)\n"
-        data_3 += f"remove <訊息ID> (刪除訊息ID裡的全部反應權限))\n\n"
+        data_3 += f"+ 點擊反應後可以獲得身份組\n"
+        data_3 += f"- 以下指令最前面需打 {settings.PREFIX}reaction\n\n"
+        data_3 += f"API: look\n"
+        data_3 += f"說明: 查看目前所設定的反應權限\n"
+        data_3 += f"API: add <訊息ID> <反應> <身份組名稱> <反應> <身份組名稱>\n"
+        data_3 += f"說明: 反應和權限名稱可一次新增多個\n"
+        data_3 += f"API: remove <訊息ID>\n"
+        data_3 += f"說明: 刪除訊息ID裡的全部反應權限\n"
         data_3 += f"```"
         return data_3
 
@@ -109,13 +116,35 @@ class Setting(Cog_Extension):
         # 權限賦予身份組
         data_4 = f"<權限賦予身份組> 管理{settings.BOT_NAME}小幫手～\n"
         data_4 += f"```diff\n"
-        data_4 += f"+ 權限賦予身份組 (設定可以用打指令的方式賦予身份組)\n"
-        data_4 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n"
-        data_4 += f"look (查看目前所設定的權限賦予身份組)\n"
-        data_4 += f"add <擁有身份組名稱> <賦予身份組名稱> <賦予身份組名稱> (新增權限賦予身份組)\n"
-        data_4 += f"remove <擁有身份組名稱> (移除擁有身份組名稱裡全部設定)\n"
+        data_4 += f"+ 設定可以用打指令的方式賦予身份組\n"
+        data_4 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n\n"
+        data_4 += f"API: look\n"
+        data_4 += f"說明: 查看目前所設定的權限賦予身份組\n"
+        data_4 += f"API: add <擁有身份組名稱> <賦予身份組名稱> <賦予身份組名稱>\n"
+        data_4 += f"說明: 新增權限賦予身份組\n"
+        data_4 += f"API: remove <擁有身份組名稱>\n"
+        data_4 += f"說明: 移除擁有身份組名稱裡全部設定\n"
         data_4 += f"```"
         return data_4
+
+    async def getData_5(self, ctx):
+        # 黑名單系統
+        data_5 = f"<阻擋名單(黑名單)> 管理{settings.BOT_NAME}小幫手～\n"
+        data_5 += f"```diff\n"
+        data_5 += f"+ 紀錄角色名稱與發生事情已減少遊戲上的不愉快\n"
+        data_5 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n\n"
+        data_5 += f"API: 舉報 <角色名稱> <事件說明>\n"
+        data_5 += f"說明: 事件說明請附上發生經過，圖片請提供url而不要使用上傳\n"
+        data_5 += f"API: 清單\n"
+        data_5 += f"說明: 公會內舉報的清單\n"
+        data_5 += f"API: 查看 <角色名稱>\n"
+        data_5 += f"說明: 包含其他公會對於此角色的看法\n"
+        data_5 += f"API: 刪除 <角色名稱>\n"
+        data_5 += f"說明: 刪除舉報紀錄\n"
+        data_5 += f"API: 參與公會\n"
+        data_5 += f"說明: 查看目前有加入的公會\n\n"
+        data_5 += f"```"
+        return data_5
 
     @setting.command()
     async def look(self, ctx):
@@ -125,6 +154,7 @@ class Setting(Cog_Extension):
             settings.REACTION_2: 2,
             settings.REACTION_3: 3,
             settings.REACTION_4: 4,
+            settings.REACTION_5: 5,
             }
         data_dict = {
             0: self.getData_0,
@@ -132,11 +162,13 @@ class Setting(Cog_Extension):
             2: self.getData_2,
             3: self.getData_3,
             4: self.getData_4,
+            5: self.getData_5,
         }
         reaction = Reaction()
         reaction.data_dict = data_dict
         reaction.ctx = ctx
         reaction.buttonActionDict = buttonActionDict
+        reaction.reactionFunction = reaction.makeQueryDict
         message = await ctx.send(await data_dict[0](ctx))
 
         reaction.msg = message
@@ -591,9 +623,103 @@ class Roles(Cog_Extension):
             owner_role_id_list.append(role.id)
         return owner_role_id_list
 
+
+class BlockList(Cog_Extension):
+    @commands.group()
+    @has_permissions(manage_roles=True)
+    async def blocklist(self, ctx):
+        ctx.guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
+        ctx.guildConfig = Info_guildConfig.objects.get(guild_id=ctx.guild_id)
+        if not ctx.guildConfig.blackList_is_valid:
+            await ctx.send(f'為了避免濫用，此功能為審核制，需驗證公會。')
+
+    @blocklist.command()
+    async def 舉報(self, ctx, username=None, *, msg=None):
+        if ctx.guildConfig.blackList_is_valid and username and msg:
+            if len(msg)>200 or len(username)>40:
+                await ctx.send(f'角色名稱最大40，事件說明最大200')
+                return
+            blocklist = BotBlocklist.objects.filter(guild_id=ctx.guild_id, author=username)
+            if blocklist:
+                blocklist.update(update_time=timezone.now(), explanation=msg)
+            else:
+                BotBlocklist.objects.create(guild_id=ctx.guild_id, author=username, explanation=msg)
+            await ctx.message.add_reaction(settings.REACTION_SUCCESS)
+        else:
+            await ctx.message.add_reaction(settings.REACTION_FAILURE)
+
+    @blocklist.command()
+    async def 清單(self, ctx):
+        if ctx.guildConfig.blackList_is_valid:
+            blocklist = BotBlocklist.objects.filter(guild_id=ctx.guild_id).values('author', 'explanation')
+            if blocklist:
+                result = [blocklist[i:i+5] for i in range(0, len(blocklist), 5)]
+
+                reaction = Reaction()
+                reaction.data_list = result
+                reaction.data_list_key = 'author'
+                reaction.data_list_value = 'explanation'
+                reaction.reactionFunction = reaction.makeQueryList
+                reaction.title = '公會內舉報的清單'
+                if len(result)>=2:
+                    reaction.buttonActionDict = {settings.REACTION_BACKWARD: -1, settings.REACTION_FORWARD: 1}
+                msg = reaction.reactionFunction()
+                message = await ctx.send(msg)
+                CACHE_REACTION[message.id] = reaction
+
+                for react in reaction.buttonActionDict.keys():
+                    await message.add_reaction(react)
+                await ctx.message.add_reaction(settings.REACTION_SUCCESS)
+
+
+    @blocklist.command()
+    async def 查看(self, ctx, username):
+        if ctx.guildConfig.blackList_is_valid:
+            blocklist = BotBlocklist.objects.filter(author=username).values('guild_id__remark', 'explanation')
+            if blocklist:
+                result = [blocklist[i:i+5] for i in range(0, len(blocklist), 5)]
+
+                reaction = Reaction()
+                reaction.data_list = result
+                reaction.data_list_key = 'guild_id__remark'
+                reaction.data_list_value = 'explanation'
+                reaction.reactionFunction = reaction.makeQueryList
+                reaction.title = '各公會頻論'
+
+                if len(result)>=2:
+                    reaction.buttonActionDict = {settings.REACTION_BACKWARD: -1, settings.REACTION_FORWARD: 1}
+                msg = reaction.reactionFunction()
+                message = await ctx.send(msg)
+                CACHE_REACTION[message.id] = reaction
+
+                for react in reaction.buttonActionDict.keys():
+                    await message.add_reaction(react)
+                await ctx.message.add_reaction(settings.REACTION_SUCCESS)
+
+    @blocklist.command()
+    async def 刪除(self, ctx, username=None):
+        if ctx.guildConfig.blackList_is_valid and username:
+            blocklist = BotBlocklist.objects.filter(guild_id=ctx.guild_id, author=username)
+            if blocklist:
+                blocklist.delete()
+                await ctx.message.add_reaction(settings.REACTION_SUCCESS)
+                return
+        await ctx.message.add_reaction(settings.REACTION_FAILURE)
+
+    @blocklist.command()
+    async def 參與公會(self, ctx):
+        if ctx.guildConfig.blackList_is_valid:
+            guilds = Info_guildConfig.objects.filter(blackList_is_valid=True).values('guild_id__remark')
+            msg = '參與公會清單：\n\n```\n'
+            for i, guild in enumerate(guilds):
+                msg += '{} {}\n'.format(i+1, guild.get('guild_id__remark'))
+            msg += '```'
+            await ctx.send(msg)
+
 def setup(bot):
     bot.add_cog(Setting(bot))
     bot.add_cog(Cipher(bot))
     bot.add_cog(ReactionRole(bot))
     bot.add_cog(Permission(bot))
     bot.add_cog(Roles(bot))
+    bot.add_cog(BlockList(bot))

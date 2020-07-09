@@ -176,6 +176,7 @@ class Base(Cog_Extension):
         reaction.data_dict = data_dict
         reaction.ctx = ctx
         reaction.buttonActionDict = buttonActionDict
+        reaction.reactionFunction = reaction.makeQueryDict
 
         message = await ctx.send(await data_dict[0](ctx))
 

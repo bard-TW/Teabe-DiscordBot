@@ -278,11 +278,14 @@ class MsgHandler(Cog_Extension):
 
     async def queryList(self, ctx, responds, reaction):
         result = [responds[i:i+12] for i in range(0, len(responds), 12)]
+        reaction.title = f'{settings.BOT_NAME}~ {settings.BOT_NAME}~'
         reaction.data_list = result
+        reaction.reactionFunction = reaction.makeQueryEmbed
+        reaction.is_embed = True
 
         if len(result)>=2:
             reaction.buttonActionDict = {settings.REACTION_BACKWARD: -1, settings.REACTION_FORWARD: 1}
-        embed = reaction.makeQueryList()
+        embed = reaction.reactionFunction()
         if embed:
             message = await ctx.send(embed=embed)
             reaction.msg = message
@@ -304,23 +307,32 @@ class MsgHandler(Cog_Extension):
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         # 加入表情反應
-        await self.changeMsgReaction(reaction, user)
+        if (not user.bot):
+            await self.changeMsgReaction(reaction, user)
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
         # 解除表情反應
-        await self.changeMsgReaction(reaction, user)
+        if (not user.bot):
+            await self.changeMsgReaction(reaction, user)
 
     async def changeMsgReaction(self, reaction, user):
         if (not user.bot):
             rea = CACHE_REACTION.get(reaction.message.id)
-            if rea and rea.data_list:
-                embed = rea.makeQueryList(str(reaction))
-                if embed:
-                    await reaction.message.edit(embed=embed)
-                    rea.time=datetime.now()
-            elif rea and rea.data_dict:
-                fun, ctx = rea.makeQueryDict(str(reaction))
+            if rea and rea.data_list: # 是清單
+                if rea.is_embed: # 是embed
+                    data = rea.reactionFunction(str(reaction))
+                    if data:
+                        await reaction.message.edit(embed=data)
+                        rea.time=datetime.now()
+                else:
+                    data = rea.reactionFunction(str(reaction))
+                    if data:
+                        await reaction.message.edit(content=data)
+                        rea.time=datetime.now()
+
+            elif rea and rea.data_dict: # 是字典
+                fun, ctx = rea.reactionFunction(str(reaction))
                 data = None
                 if fun and ctx:
                     data = await fun(ctx)
@@ -331,9 +343,12 @@ class MsgHandler(Cog_Extension):
             now = datetime.now()
             for msg_id in list(CACHE_REACTION):
                 if (now - CACHE_REACTION[msg_id].time).seconds > 600:
-                    for react in CACHE_REACTION[msg_id].buttonActionDict.keys():
-                        await CACHE_REACTION[msg_id].msg.remove_reaction(react, self.bot.user)
-                    del(CACHE_REACTION[msg_id])
+                    try:
+                        for react in CACHE_REACTION[msg_id].buttonActionDict.keys():
+                            await CACHE_REACTION[msg_id].msg.remove_reaction(react, self.bot.user)
+                        del(CACHE_REACTION[msg_id])
+                    except Exception as e:
+                        print(e, user.bot, user)
 
 
 def setup(bot):

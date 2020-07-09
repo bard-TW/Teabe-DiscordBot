@@ -18,8 +18,30 @@ class Reaction(object):
     page = int()  # 頁數
     buttonActionDict = dict()  # 按鈕作用
     ctx = None # 上下文
+    reactionFunction = None
+    is_embed = False
+
     def __init__(self,):
         self.time = datetime.now()
+
+    def makeQueryEmbed(self, button=None):
+        if button:
+            num = self.buttonActionDict.get(button)
+        else:
+            num = 0
+        if num != None:
+            self.page += num
+            if 0 <= self.page < len(self.data_list):
+                datas = self.data_list[self.page]
+                embed=discord.Embed(title=self.title)
+                for data in datas:
+                    embed.add_field(name=data[self.data_list_key], value=data[self.data_list_value], inline=True)
+                if len(self.data_list) > 1:
+                    embed.set_footer(text=f"第{self.page+1}頁, 共{len(self.data_list)}頁, 反應慢請慢慢點喔")
+                return embed
+            else:
+                self.page -= num
+        return None
 
     def makeQueryList(self, button=None):
         if button:
@@ -30,12 +52,13 @@ class Reaction(object):
             self.page += num
             if 0 <= self.page < len(self.data_list):
                 datas = self.data_list[self.page]
-                self.title = f'{settings.BOT_NAME}~ {settings.BOT_NAME}~'
-                embed=discord.Embed(title=self.title)
+                msg = f'{self.title}\n\n'
                 for data in datas:
-                    embed.add_field(name=data[self.data_list_key], value=data[self.data_list_value], inline=True)
-                embed.set_footer(text=f"第{self.page+1}頁, 共{len(self.data_list)}頁, 反應慢請慢慢點喔")
-                return embed
+                    msg += f'> {data[self.data_list_key]}\n'
+                    msg += f'```{data[self.data_list_value]}```\n'
+                if len(self.data_list) > 1:
+                    msg+=(f"\n第{self.page+1}頁, 共{len(self.data_list)}頁, 反應慢請慢慢點喔")
+                return msg
             else:
                 self.page -= num
         return None
