@@ -98,7 +98,7 @@ class Info_guildConfig(models.Model):
     guild_id = models.ForeignKey(Info_guild, on_delete=models.CASCADE, blank=True, null=True, verbose_name='公會')
     previou_is_valid = models.BooleanField(default=True, verbose_name='推齊', help_text='開啟推齊功能')
     respond_is_valid = models.BooleanField(default=True, verbose_name='回應', help_text='開啟回應功能')
-    respond_only_guild = models.BooleanField(default=False, verbose_name='公會回應', help_text='只允許公會內教的')
+    respond_only_guild = models.BooleanField(default=True, verbose_name='公會回應', help_text='只允許公會內教的')
 
     join_msg_is_valid = models.BooleanField(default=True, verbose_name='開啟進群通知', help_text='若無設定通知頻道有人進群時將自動關閉')
     join_guild_msg_channel = models.IntegerField(null=True, blank=True, verbose_name='進群的訊息頻道', help_text='設定進群通知頻道')
