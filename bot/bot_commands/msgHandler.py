@@ -319,36 +319,37 @@ class MsgHandler(Cog_Extension):
     async def changeMsgReaction(self, reaction, user):
         if (not user.bot):
             rea = CACHE_REACTION.get(reaction.message.id)
-            if rea and rea.data_list: # 是清單
-                if rea.is_embed: # 是embed
-                    data = rea.reactionFunction(str(reaction))
-                    if data:
-                        await reaction.message.edit(embed=data)
-                        rea.time=datetime.now()
-                else:
-                    data = rea.reactionFunction(str(reaction))
+            if rea:
+                if rea and rea.data_list: # 是清單
+                    if rea.is_embed: # 是embed
+                        data = rea.reactionFunction(str(reaction))
+                        if data:
+                            await reaction.message.edit(embed=data)
+                            rea.time=datetime.now()
+                    else:
+                        data = rea.reactionFunction(str(reaction))
+                        if data:
+                            await reaction.message.edit(content=data)
+                            rea.time=datetime.now()
+
+                elif rea and rea.data_dict: # 是字典
+                    fun, ctx = rea.reactionFunction(str(reaction))
+                    data = None
+                    if fun and ctx:
+                        data = await fun(ctx)
                     if data:
                         await reaction.message.edit(content=data)
                         rea.time=datetime.now()
 
-            elif rea and rea.data_dict: # 是字典
-                fun, ctx = rea.reactionFunction(str(reaction))
-                data = None
-                if fun and ctx:
-                    data = await fun(ctx)
-                if data:
-                    await reaction.message.edit(content=data)
-                    rea.time=datetime.now()
-
-            now = datetime.now()
-            for msg_id in list(CACHE_REACTION):
-                if (now - CACHE_REACTION[msg_id].time).seconds > 600:
-                    try:
-                        for react in CACHE_REACTION[msg_id].buttonActionDict.keys():
-                            await CACHE_REACTION[msg_id].msg.remove_reaction(react, self.bot.user)
-                        del(CACHE_REACTION[msg_id])
-                    except Exception as e:
-                        print(e, user.bot, user)
+                now = datetime.now()
+                for msg_id in list(CACHE_REACTION):
+                    if (now - CACHE_REACTION[msg_id].time).seconds > 600:
+                        try:
+                            for react in CACHE_REACTION[msg_id].buttonActionDict.keys():
+                                await CACHE_REACTION[msg_id].msg.remove_reaction(react, self.bot.user)
+                            del(CACHE_REACTION[msg_id])
+                        except Exception as e:
+                            print(e, user.bot, user)
 
 
 def setup(bot):
