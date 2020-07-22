@@ -44,15 +44,17 @@ class MsgHandler(Cog_Extension):
         guildConfig = Info_guildConfig.objects.get(guild_id=guild_id)
         if (not msg.author.bot) and (guildConfig.respond_is_valid):
             respond = ''
-            if settings.BOT_NAME == msg.content:
+            content = msg.content.lower()
+
+            if settings.BOT_NAME == content:
                 # 打招呼
                 responds = BotHelloResponds.objects.all()
                 if responds:
                     respond = random.choice(responds)
 
-            elif settings.BOT_NAME == msg.content[:len(settings.BOT_NAME)]:
+            elif settings.BOT_NAME == content[:len(settings.BOT_NAME)]:
                 # 隨機回話
-                keyword = msg.content[len(settings.BOT_NAME):]
+                keyword = content[len(settings.BOT_NAME):]
                 if guildConfig.respond_only_guild:
                     responds = BotResponds.objects.filter(keyword=keyword, guild_id=guild_id)
                 else:
@@ -61,7 +63,7 @@ class MsgHandler(Cog_Extension):
                     respond = random.choice(responds.values('respond'))['respond']
             else:
                 # 回最後一句
-                keyword = msg.content
+                keyword = content
                 if guildConfig.respond_only_guild:
                     responds = BotResponds.objects.filter(keyword=keyword, guild_id=guild_id).last()
                 else:
@@ -103,6 +105,7 @@ class MsgHandler(Cog_Extension):
             return
 
         if keyword[:2] != settings.BOT_NAME:
+            keyword = keyword.lower()
             if len(arg):
                 # 公會名稱更新
                 guild_data = Info_guild.objects.get(guild_id=ctx.guild.id)
@@ -349,7 +352,8 @@ class MsgHandler(Cog_Extension):
                                 await CACHE_REACTION[msg_id].msg.remove_reaction(react, self.bot.user)
                             del(CACHE_REACTION[msg_id])
                         except Exception as e:
-                            print(e, user.bot, user)
+                            del(CACHE_REACTION[msg_id])
+                            print((now - CACHE_REACTION[msg_id].time).seconds, e, user.bot, user)
 
 
 def setup(bot):
