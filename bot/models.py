@@ -58,18 +58,24 @@ class BotResponds(models.Model):
         verbose_name = "Bot 回應"
         verbose_name_plural = "Bot 4 回應"
 
-class JoinGuildCipher(models.Model):
+class JoinAndLeaveGuild(models.Model):
     guild_id = models.ForeignKey(Info_guild, on_delete=models.CASCADE, blank=True, null=True, verbose_name='公會')
-    msg1 = models.TextField(max_length=100, null=True, blank=True, verbose_name='訊息1')
-    msg2 = models.TextField(max_length=100, null=True, blank=True, verbose_name='訊息2')
-    msg3 = models.TextField(max_length=100, null=True, blank=True, verbose_name='訊息3')
-    msg4 = models.TextField(max_length=100, null=True, blank=True, verbose_name='訊息4')
-    msg5 = models.TextField(max_length=100, null=True, blank=True, verbose_name='訊息5')
+    joinGuildCipher1 = models.TextField(max_length=210, null=True, blank=True, verbose_name='進群密語1')
+    joinGuildCipher2 = models.TextField(max_length=210, null=True, blank=True, verbose_name='進群密語2')
+    joinGuildCipher3 = models.TextField(max_length=210, null=True, blank=True, verbose_name='進群密語3')
+    joinGuildCipher4 = models.TextField(max_length=210, null=True, blank=True, verbose_name='進群密語4')
+    joinGuildCipher5 = models.TextField(max_length=210, null=True, blank=True, verbose_name='進群密語5')
+
+    joinGuildTitle = models.TextField(max_length=20, null=True, blank=True, default='歡迎加入伺服器～', verbose_name='進群通知標題')
+    joinGuildDscription = models.TextField(max_length=40, null=True, blank=True, default='請先到報到區報到喔！', verbose_name='進群通知描述')
+    leaveGuildTitle = models.TextField(max_length=20, null=True, blank=True, default='我們懷念他QAQ', verbose_name='離群通知標題')
+    leaveGuildDescription = models.TextField(max_length=40, null=True, blank=True, default='嗚嗚～', verbose_name='離群通知描述')
+
     def __str__(self):
         return self.guild_id.guild
     class Meta:
-        verbose_name = "Bot 加入公會密語"
-        verbose_name_plural = "Bot 3 加入公會密語"
+        verbose_name = "Bot 進出公會通知"
+        verbose_name_plural = "Bot 3 進出公會通知"
 
 class BotReactionRoles(models.Model):
     guild_id = models.ForeignKey(Info_guild, on_delete=models.CASCADE, blank=True, null=True, verbose_name='公會')

@@ -1,13 +1,14 @@
 import discord
 from discord.ext import commands
 
-from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles, Info_roles, BotPermissionRoles, BotBlocklist
+from bot.models import Info_guild, Info_guildConfig, JoinAndLeaveGuild, BotReactionRoles, Info_roles, BotPermissionRoles, BotBlocklist
 
 from bot.core.classes import Cog_Extension
 from bot.core.cache import CACHE_REACTION_ROLE, CACHE_REACTION, Reaction
 from django.db.models import Count, F, Q, QuerySet, Max
 from django.conf import settings
 from django.utils import timezone
+import time
 import re
 
 from discord.ext.commands import has_permissions, MemberConverter
@@ -48,7 +49,7 @@ class Setting(Cog_Extension):
         data_0 += f"- 點擊下方反應會出現相對應說明\n\n"
         data_0 += f"+ {settings.REACTION_0} >> 回目錄\n"
         data_0 += f"+ {settings.REACTION_1} >> 基本設定\n"
-        data_0 += f"+ {settings.REACTION_2} >> 進群密語\n"
+        data_0 += f"+ {settings.REACTION_2} >> 進出群通知\n"
         data_0 += f"+ {settings.REACTION_3} >> 反應權限\n"
         data_0 += f"+ {settings.REACTION_4} >> 權限賦予身份組\n"
         data_0 += f"+ {settings.REACTION_5} >> 阻擋名單(黑名單)\n"
@@ -83,17 +84,29 @@ class Setting(Cog_Extension):
         return data_1
 
     async def getData_2(self, ctx):
-        # 進群密語
-        data_2 = f"<進群密語> 管理{settings.BOT_NAME}小幫手～\n"
+        # 進出群通知
+        data_2 = f"<進出群通知> 管理{settings.BOT_NAME}小幫手～\n"
         data_2 += f"```diff\n"
-        data_2 += f"+ 使用者進群後的使用者密語通知訊息\n"
-        data_2 += f"- 以下指令最前面需打 {settings.PREFIX}cipher\n\n"
-        data_2 += f"API: look\n"
-        data_2 += f"說明: 查看目前的進群密語\n"
-        data_2 += f"API: test\n"
+        data_2 += f"+ 使用者使用者進群密語，進出群推播文字設定\n"
+        data_2 += f"- 以下指令最前面需打 {settings.PREFIX}notice\n\n"
+        data_2 += f"API: cipher_test\n"
         data_2 += f"說明: 進群密語測試\n"
-        data_2 += f"API: modify <1~5> <空\\訊息>\n"
-        data_2 += f"說明: 進群密語刪除\\修改訊息\n"
+        data_2 += f"API: cipher_look\n"
+        data_2 += f"說明: 查看目前的進群密語\n"
+        data_2 += f"API: join_test\n"
+        data_2 += f"說明: 進群通知測試\n"
+        data_2 += f"API: leave_test\n"
+        data_2 += f"說明: 離群通知測試\n\n"
+        data_2 += f"API: setJoinGuildCipher1 <密語1>\n"
+        data_2 += f"API: setJoinGuildCipher2 <密語2>\n"
+        data_2 += f"API: setJoinGuildCipher3 <密語3>\n"
+        data_2 += f"API: setJoinGuildCipher4 <密語4>\n"
+        data_2 += f"API: setJoinGuildCipher5 <密語5>\n"
+        data_2 += f"API: setJoinGuildTitle <進群標題>\n"
+        data_2 += f"API: setJoinGuildDscription <進群描述>\n"
+        data_2 += f"API: setLeaveGuildTitle <離群標題>\n"
+        data_2 += f"API: setLeaveGuildDescription <離群描述>\n"
+        data_2 += f"說明: 刪除\\修改訊息\n"
         data_2 += f"```"
         return data_2
 
@@ -247,27 +260,34 @@ class Setting(Cog_Extension):
             await ctx.send('此頻道為離群通知頻道')
 
 
-class Cipher(Cog_Extension):
+class JoinAndLeave(Cog_Extension):
     @commands.group()
     @has_permissions(manage_roles=True)
-    async def cipher(self, ctx):
+    async def notice(self, ctx):
         guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
-        ctx.cipher = JoinGuildCipher.objects.get(guild_id=guild_id)
+        ctx.joinAndLeave = JoinAndLeaveGuild.objects.get(guild_id=guild_id)
 
-    @cipher.command()
-    async def test(self, ctx):
+    @notice.command()
+    async def cipher_test(self, ctx):
         if ctx.guild:
-            msgs = [ctx.cipher.msg1, ctx.cipher.msg2, ctx.cipher.msg3, ctx.cipher.msg4, ctx.cipher.msg5]
+            msgs = [ctx.joinAndLeave.joinGuildCipher1, 
+                    ctx.joinAndLeave.joinGuildCipher2, 
+                    ctx.joinAndLeave.joinGuildCipher3, 
+                    ctx.joinAndLeave.joinGuildCipher4, 
+                    ctx.joinAndLeave.joinGuildCipher5]
             for msg in msgs:
                 if msg:
                     await ctx.author.send(msg)
                 await asyncio.sleep(2)
 
-    @cipher.command()
-    async def look(self, ctx):
+    @notice.command()
+    async def cipher_look(self, ctx):
         msg_str = '已設定的密語訊息:\n'
-
-        msgs = [ctx.cipher.msg1, ctx.cipher.msg2, ctx.cipher.msg3, ctx.cipher.msg4, ctx.cipher.msg5]
+        msgs = [ctx.joinAndLeave.joinGuildCipher1, 
+                ctx.joinAndLeave.joinGuildCipher2, 
+                ctx.joinAndLeave.joinGuildCipher3, 
+                ctx.joinAndLeave.joinGuildCipher4, 
+                ctx.joinAndLeave.joinGuildCipher5]
         for i, msg in enumerate(msgs, 1):
             if msg:
                 msg_str += '{}:\n> {}\n\n'.format(i, msg.replace("\n", "\n> "))
@@ -275,30 +295,77 @@ class Cipher(Cog_Extension):
                 msg_str += f'{i}:\n> --\n\n'
         await ctx.send(msg_str)
 
-    @cipher.command()
-    async def modify(self, ctx, num, *, msg=None):
-        if ctx.guild:
-            try:
-                num = int(num)
-                if num == 1:
-                    ctx.cipher.msg1 = msg
-                elif num == 2:
-                    ctx.cipher.msg2 = msg
-                elif num == 3:
-                    ctx.cipher.msg3 = msg
-                elif num == 4:
-                    ctx.cipher.msg4 = msg
-                elif num == 5:
-                    ctx.cipher.msg5 = msg
-                else:
-                    await ctx.send('請輸入1~5數字')
-                    await ctx.message.add_reaction(settings.REACTION_FAILURE)
-                    return
-                ctx.cipher.save()
-                await ctx.message.add_reaction(settings.REACTION_SUCCESS)
-            except:
-                await ctx.send('請輸入1~5數字')
+    @notice.command()
+    async def setJoinGuildCipher1(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher1', WordCount=200, msg=msg)
+
+    @notice.command()
+    async def setJoinGuildCipher2(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher2', WordCount=200, msg=msg)
+
+    @notice.command()
+    async def setJoinGuildCipher3(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher3', WordCount=200, msg=msg)
+
+    @notice.command()
+    async def setJoinGuildCipher4(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher4', WordCount=200, msg=msg)
+
+    @notice.command()
+    async def setJoinGuildCipher5(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher5', WordCount=200, msg=msg)
+
+    @notice.command()
+    async def setJoinGuildTitle(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='joinGuildTitle', WordCount=10, msg=msg, default='歡迎加入伺服器～')
+
+    @notice.command()
+    async def setJoinGuildDscription(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='joinGuildDscription', WordCount=30, msg=msg, default='請先到報到區報到喔！')
+
+    @notice.command()
+    async def setLeaveGuildTitle(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='leaveGuildTitle', WordCount=10, msg=msg, default='我們懷念他QAQ')
+
+    @notice.command()
+    async def setLeaveGuildDescription(self, ctx, *, msg=None):
+        await self.saveDatabase(ctx=ctx, keyWord='leaveGuildDescription', WordCount=30, msg=msg, default='嗚嗚～')
+
+    async def saveDatabase(self, ctx, keyWord, WordCount, msg, default=None):
+        if msg:
+            if len(msg) <= WordCount:
+                ctx.joinAndLeave.__dict__[keyWord] = msg
+            else:
+                await ctx.send(f'訊息超過最大值： {WordCount}')
                 await ctx.message.add_reaction(settings.REACTION_FAILURE)
+                return
+        else:
+            ctx.joinAndLeave.__dict__[keyWord] = default
+        ctx.joinAndLeave.save()
+        await ctx.message.add_reaction(settings.REACTION_SUCCESS)
+
+    @notice.command()
+    async def join_test(self, ctx):
+        embed=discord.Embed(
+            title=ctx.joinAndLeave.joinGuildTitle,
+            description=ctx.joinAndLeave.joinGuildDscription,
+            color=0x0000FF)
+        embed.set_thumbnail(url="{}".format(ctx.author.avatar_url_as()))
+        embed.add_field(name="帳號", value="{}".format(ctx.author.mention), inline=True)
+        embed.add_field(name="時間", value="{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())), inline=False)
+        await ctx.send(embed=embed)
+
+    @notice.command()
+    async def leave_test(self, ctx):
+        embed=discord.Embed(
+            title=ctx.joinAndLeave.leaveGuildTitle,
+            description=ctx.joinAndLeave.leaveGuildDescription,
+            color=0xff0000)
+        embed.set_thumbnail(url="{}".format(ctx.author.avatar_url_as()))
+        embed.add_field(name="帳號", value="{}".format(ctx.author.mention), inline=True)
+        embed.add_field(name="暱稱", value="{}".format(ctx.author.display_name), inline=True)
+        embed.add_field(name="時間", value="{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())), inline=False)
+        await ctx.send(embed=embed)
 
 class ReactionRole(Cog_Extension):
     @commands.group()
@@ -718,8 +785,10 @@ class BlockList(Cog_Extension):
 
 def setup(bot):
     bot.add_cog(Setting(bot))
-    bot.add_cog(Cipher(bot))
+    bot.add_cog(JoinAndLeave(bot))
     bot.add_cog(ReactionRole(bot))
     bot.add_cog(Permission(bot))
     bot.add_cog(Roles(bot))
     bot.add_cog(BlockList(bot))
+
+

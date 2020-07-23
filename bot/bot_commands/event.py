@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db.models import Max
 from discord.errors import Forbidden
 
-from bot.models import Info_guild, Info_guildConfig, JoinGuildCipher, BotReactionRoles, Info_roles
+from bot.models import Info_guild, Info_guildConfig, JoinAndLeaveGuild, BotReactionRoles, Info_roles
 from bot.core.cache import CACHE_REACTION_ROLE
 
 from discord.ext.commands import has_permissions, MissingPermissions, CommandInvokeError
@@ -26,12 +26,13 @@ class Event(Cog_Extension):
     async def on_member_join(self, member):
         guild_id = Info_guild.objects.get(guild_id=member.guild.id)
         guildConfig = Info_guildConfig.objects.get(guild_id=guild_id)
+        joinAndLeave = JoinAndLeaveGuild.objects.get(guild_id=guild_id)
         if guildConfig.join_msg_is_valid:
             channel = self.bot.get_channel(guildConfig.join_guild_msg_channel)
             if channel:
                 embed=discord.Embed(
-                    title='歡迎加入伺服器～',
-                    description='請先到報到區報到喔！',
+                    title=joinAndLeave.joinGuildTitle,
+                    description=joinAndLeave.joinGuildDscription,
                     color=0x0000FF)
                 embed.set_thumbnail(url="{}".format(member.avatar_url_as()))
                 embed.add_field(name="帳號", value="{}".format(member.mention), inline=True)
@@ -42,8 +43,7 @@ class Event(Cog_Extension):
                 guildConfig.save()
 
         if guildConfig.join_guild_cipher_is_valid:
-            cipher = JoinGuildCipher.objects.get(guild_id=guild_id)
-            msgs = [cipher.msg1, cipher.msg2, cipher.msg3, cipher.msg4, cipher.msg5]
+            msgs = [joinAndLeave.joinGuildCipher1, joinAndLeave.joinGuildCipher2, joinAndLeave.joinGuildCipher3, joinAndLeave.joinGuildCipher4, joinAndLeave.joinGuildCipher5]
             for msg in msgs:
                 if msg:
                     await member.send(msg)
@@ -53,11 +53,13 @@ class Event(Cog_Extension):
     async def on_member_remove(self, member):
         guild_id = Info_guild.objects.get(guild_id=member.guild.id)
         guildConfig = Info_guildConfig.objects.get(guild_id=guild_id)
+        joinAndLeave = JoinAndLeaveGuild.objects.get(guild_id=guild_id)
         if guildConfig.leave_msg_is_valid:
             channel = self.bot.get_channel(guildConfig.leave_guild_msg_channel)
             if channel:
                 embed=discord.Embed(
-                    title='我們懷念他QAQ',
+                    title=joinAndLeave.leaveGuildTitle,
+                    description=joinAndLeave.leaveGuildDescription,
                     color=0xff0000)
                 embed.set_thumbnail(url="{}".format(member.avatar_url_as()))
                 embed.add_field(name="帳號", value="{}".format(member.mention), inline=True)
@@ -114,9 +116,9 @@ class Event(Cog_Extension):
         if not guildConfig:
             Info_guildConfig.objects.create(guild_id=guild_data[0])
 
-        joinGuildCipher = JoinGuildCipher.objects.filter(guild_id=guild_data[0])
-        if not joinGuildCipher:
-            JoinGuildCipher.objects.create(guild_id=guild_data[0])
+        joinAndLeave = JoinAndLeaveGuild.objects.filter(guild_id=guild_data[0])
+        if not joinAndLeave:
+            JoinAndLeaveGuild.objects.create(guild_id=guild_data[0])
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):

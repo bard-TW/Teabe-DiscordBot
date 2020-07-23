@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds, JoinGuildCipher, BotReactionRoles, Info_roles, BotPermissionRoles, BotBlocklist
+from .models import BotResponds, Info_guild, Info_author, Info_guildNickname, Info_guildConfig, BotHelloResponds
+from .models import JoinAndLeaveGuild, BotReactionRoles, Info_roles, BotPermissionRoles, BotBlocklist
 # Register your models here.
 
 
@@ -30,6 +31,7 @@ class Info_rolesAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'roles_id', 'roles_name')
 admin.site.register(Info_roles, Info_rolesAdmin)
 
+
 class Info_guildConfigAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'previou_is_valid', 'respond_is_valid', 'respond_only_guild', 'join_msg_is_valid', 
                     'join_guild_msg_channel', 'leave_msg_is_valid', 'leave_guild_msg_channel', 'join_guild_cipher_is_valid',
@@ -46,14 +48,18 @@ class BoTHelloRespondsAdmin(admin.ModelAdmin):
     list_display = ('respond',)
 admin.site.register(BotHelloResponds, BoTHelloRespondsAdmin)
 
-class JoinGuildCipherAdmin(admin.ModelAdmin):
-    list_display = ('guild_id', 'msg1', 'msg2', 'msg3', 'msg4', 'msg5')
-admin.site.register(JoinGuildCipher, JoinGuildCipherAdmin)
+
+class JoinAndLeaveGuildAdmin(admin.ModelAdmin):
+    list_display = ('guild_id', 'joinGuildCipher1', 'joinGuildCipher2', 'joinGuildCipher3', 'joinGuildCipher4', 'joinGuildCipher5',
+                    'joinGuildTitle', 'joinGuildDscription', 'leaveGuildTitle', 'leaveGuildDescription')
+admin.site.register(JoinAndLeaveGuild, JoinAndLeaveGuildAdmin)
+
 
 class BotReactionRolesAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'msg_id', 'emoji_id', 'emoji_name', 'roles_id')
     list_filter = ('guild_id',)  # 塞選條件
 admin.site.register(BotReactionRoles, BotReactionRolesAdmin)
+
 
 class BotPermissionRolesAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'permission', 'roles')
