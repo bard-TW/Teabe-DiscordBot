@@ -14,7 +14,7 @@ class Base(Cog_Extension):
     async def ping(self, ctx):
         await ctx.send('{} ms'.format(round(self.bot.latency*1000)))
 
-    @commands.command()
+    @commands.command(name='sayd', aliases=['偽裝'])
     async def sayd(self, ctx, *, msg):
         #刪除+複送
         try:
@@ -23,8 +23,8 @@ class Base(Cog_Extension):
         except Forbidden:
             await ctx.send(f'{settings.BOT_NAME}沒有權限刪除 QAQ')
 
-    @commands.command()
-    async def 限時(self, ctx, num: int):
+    @commands.command(name='timed', aliases=['限時'])
+    async def timed(self, ctx, num: int):
         try:
             if 0 < num <= 1800:
                 await ctx.message.add_reaction(settings.REACTION_SUCCESS)
@@ -33,8 +33,8 @@ class Base(Cog_Extension):
         except Forbidden:
             await ctx.send(f'{settings.BOT_NAME}沒有權限刪除 QAQ')
 
-    @commands.command()
-    @has_permissions(manage_roles=True)
+    @commands.command(name='clean', aliases=['刪除'])
+    @has_permissions(manage_messages=True)
     async def clean(self, ctx, num: int):
         try:
             if num<=200:

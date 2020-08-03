@@ -166,7 +166,16 @@ class Event(Cog_Extension):
     async def on_command_error(self, ctx, error):
         if isinstance(error, MissingPermissions):
             if ctx.guild:
-                await ctx.send('您缺少權限！')
+                msg = '您缺少以下權限：\n```'
+                for missing_perm in error.missing_perms:
+                    if missing_perm == 'manage_messages':
+                        msg += '管理訊息\n'
+                    elif missing_perm == 'manage_roles':
+                        msg += '管理身分組\n'
+                    else:
+                        msg += f'{missing_perm}\n'
+                msg += '```'
+                await ctx.send(msg)
             else:
                 await ctx.send('私人頻道無法使用此功能')
             await ctx.message.add_reaction(settings.REACTION_FAILURE)

@@ -36,7 +36,7 @@ async def get_roles(guild_id, roles_id, roles_name):
         return role
 
 class Setting(Cog_Extension):
-    @commands.group()
+    @commands.group(name='setting', aliases=['s'])
     @has_permissions(manage_roles=True)
     async def setting(self, ctx):
         ctx.guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
@@ -88,7 +88,7 @@ class Setting(Cog_Extension):
         data_2 = f"<進出群通知> 管理{settings.BOT_NAME}小幫手～\n"
         data_2 += f"```diff\n"
         data_2 += f"+ 使用者使用者進群密語，進出群推播文字設定\n"
-        data_2 += f"- 以下指令最前面需打 {settings.PREFIX}notice\n\n"
+        data_2 += f"- 以下指令最前面需打 {settings.PREFIX}notify\n\n"
         data_2 += f"API: cipher_test\n"
         data_2 += f"說明: 進群密語測試\n"
         data_2 += f"API: cipher_look\n"
@@ -111,16 +111,16 @@ class Setting(Cog_Extension):
         return data_2
 
     async def getData_3(self, ctx):
-        # 進群密語
+        # 反應權限
         data_3 = f"<反應權限> 管理{settings.BOT_NAME}小幫手～\n"
         data_3 += f"```diff\n"
         data_3 += f"+ 點擊反應後可以獲得身份組\n"
         data_3 += f"- 以下指令最前面需打 {settings.PREFIX}reaction\n\n"
         data_3 += f"API: look\n"
         data_3 += f"說明: 查看目前所設定的反應權限\n"
-        data_3 += f"API: add <訊息ID> <反應> <身份組名稱> <反應> <身份組名稱>\n"
+        data_3 += f"API: add [訊息ID] [反應] [身份組名稱] [反應] [身份組名稱]\n"
         data_3 += f"說明: 反應和權限名稱可一次新增多個\n"
-        data_3 += f"API: remove <訊息ID>\n"
+        data_3 += f"API: remove [訊息ID]\n"
         data_3 += f"說明: 刪除訊息ID裡的全部反應權限\n"
         data_3 += f"```"
         return data_3
@@ -133,9 +133,9 @@ class Setting(Cog_Extension):
         data_4 += f"- 以下指令最前面需打 {settings.PREFIX}permission\n\n"
         data_4 += f"API: look\n"
         data_4 += f"說明: 查看目前所設定的權限賦予身份組\n"
-        data_4 += f"API: add <擁有身份組名稱> <賦予身份組名稱> <賦予身份組名稱>\n"
+        data_4 += f"API: add [擁有身份組名稱] [賦予身份組名稱] [賦予身份組名稱]\n"
         data_4 += f"說明: 新增權限賦予身份組\n"
-        data_4 += f"API: remove <擁有身份組名稱>\n"
+        data_4 += f"API: remove [擁有身份組名稱]\n"
         data_4 += f"說明: 移除擁有身份組名稱裡全部設定\n"
         data_4 += f"```"
         return data_4
@@ -159,7 +159,7 @@ class Setting(Cog_Extension):
         data_5 += f"```"
         return data_5
 
-    @setting.command()
+    @setting.command(name='look', aliases=['l'])
     async def look(self, ctx):
         buttonActionDict = {
             settings.REACTION_0: 0,
@@ -191,7 +191,7 @@ class Setting(Cog_Extension):
             await message.add_reaction(react)
         await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @setting.command()
+    @setting.command(name='previou_is_valid', aliases=['pi'])
     async def previou_is_valid(self, ctx):
         # 推齊
         if ctx.guild:
@@ -199,15 +199,15 @@ class Setting(Cog_Extension):
             ctx.guildConfig.save()
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @setting.command()
+    @setting.command(name='respond_is_valid', aliases=['ri'])
     async def respond_is_valid(self, ctx):
-        # 回應
+        # 學說話
         if ctx.guild:
             ctx.guildConfig.respond_is_valid = not ctx.guildConfig.respond_is_valid
             ctx.guildConfig.save()
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @setting.command()
+    @setting.command(name='respond_only_guild', aliases=['ro'])
     async def respond_only_guild(self, ctx):
         # 只說伺服器內教的
         if ctx.guild:
@@ -215,7 +215,7 @@ class Setting(Cog_Extension):
             ctx.guildConfig.save()
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @setting.command()
+    @setting.command(name='join_msg_is_valid', aliases=['jm'])
     async def join_msg_is_valid(self, ctx):
         # 開啟進群通知
         if ctx.guild:
@@ -223,7 +223,7 @@ class Setting(Cog_Extension):
             ctx.guildConfig.save()
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @setting.command()
+    @setting.command(name='leave_msg_is_valid', aliases=['lm'])
     async def leave_msg_is_valid(self, ctx):
         # 開啟離群通知
         if ctx.guild:
@@ -231,7 +231,7 @@ class Setting(Cog_Extension):
             ctx.guildConfig.save()
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @setting.command()
+    @setting.command(name='join_guild_cipher_is_valid', aliases=['jc'])
     async def join_guild_cipher_is_valid(self, ctx):
         # 開啟進群密語
         if ctx.guild:
@@ -239,7 +239,7 @@ class Setting(Cog_Extension):
             ctx.guildConfig.save()
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @setting.command()
+    @setting.command(name='join_guild_msg_channel', aliases=['jgm'])
     async def join_guild_msg_channel(self, ctx):
         # 進群的訊息頻道
         if ctx.guild:
@@ -249,7 +249,7 @@ class Setting(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
             await ctx.send('此頻道為進群通知頻道')
 
-    @setting.command()
+    @setting.command(name='leave_guild_msg_channel', aliases=['lgm'])
     async def leave_guild_msg_channel(self, ctx):
         # 離群的訊息頻道
         if ctx.guild:
@@ -263,11 +263,11 @@ class Setting(Cog_Extension):
 class JoinAndLeave(Cog_Extension):
     @commands.group()
     @has_permissions(manage_roles=True)
-    async def notice(self, ctx):
+    async def notify(self, ctx):
         guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
         ctx.joinAndLeave = JoinAndLeaveGuild.objects.get(guild_id=guild_id)
 
-    @notice.command()
+    @notify.command(name='cipher_test', aliases=['ct'])
     async def cipher_test(self, ctx):
         if ctx.guild:
             msgs = [ctx.joinAndLeave.joinGuildCipher1, 
@@ -280,7 +280,7 @@ class JoinAndLeave(Cog_Extension):
                     await ctx.author.send(msg)
                 await asyncio.sleep(2)
 
-    @notice.command()
+    @notify.command(name='cipher_look', aliases=['cl'])
     async def cipher_look(self, ctx):
         msg_str = '已設定的密語訊息:\n'
         msgs = [ctx.joinAndLeave.joinGuildCipher1, 
@@ -295,39 +295,39 @@ class JoinAndLeave(Cog_Extension):
                 msg_str += f'{i}:\n> --\n\n'
         await ctx.send(msg_str)
 
-    @notice.command()
+    @notify.command(name='setJoinGuildCipher1', aliases=['s1'])
     async def setJoinGuildCipher1(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher1', WordCount=200, msg=msg)
 
-    @notice.command()
+    @notify.command(name='setJoinGuildCipher2', aliases=['s2'])
     async def setJoinGuildCipher2(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher2', WordCount=200, msg=msg)
 
-    @notice.command()
+    @notify.command(name='setJoinGuildCipher3', aliases=['s3'])
     async def setJoinGuildCipher3(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher3', WordCount=200, msg=msg)
 
-    @notice.command()
+    @notify.command(name='setJoinGuildCipher4', aliases=['s4'])
     async def setJoinGuildCipher4(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher4', WordCount=200, msg=msg)
 
-    @notice.command()
+    @notify.command(name='setJoinGuildCipher5', aliases=['s5'])
     async def setJoinGuildCipher5(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='joinGuildCipher5', WordCount=200, msg=msg)
 
-    @notice.command()
+    @notify.command(name='setJoinGuildTitle', aliases=['sjt'])
     async def setJoinGuildTitle(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='joinGuildTitle', WordCount=10, msg=msg, default='歡迎加入伺服器～')
 
-    @notice.command()
+    @notify.command(name='setJoinGuildDscription', aliases=['sjd'])
     async def setJoinGuildDscription(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='joinGuildDscription', WordCount=30, msg=msg, default='請先到報到區報到喔！')
 
-    @notice.command()
+    @notify.command(name='setLeaveGuildTitle', aliases=['slt'])
     async def setLeaveGuildTitle(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='leaveGuildTitle', WordCount=10, msg=msg, default='我們懷念他QAQ')
 
-    @notice.command()
+    @notify.command(name='setLeaveGuildDescription', aliases=['jld'])
     async def setLeaveGuildDescription(self, ctx, *, msg=None):
         await self.saveDatabase(ctx=ctx, keyWord='leaveGuildDescription', WordCount=30, msg=msg, default='嗚嗚～')
 
@@ -344,7 +344,7 @@ class JoinAndLeave(Cog_Extension):
         ctx.joinAndLeave.save()
         await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @notice.command()
+    @notify.command(name='join_test', aliases=['jt'])
     async def join_test(self, ctx):
         embed=discord.Embed(
             title=ctx.joinAndLeave.joinGuildTitle,
@@ -355,7 +355,7 @@ class JoinAndLeave(Cog_Extension):
         embed.add_field(name="時間", value="{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())), inline=False)
         await ctx.send(embed=embed)
 
-    @notice.command()
+    @notify.command(name='leave_test', aliases=['lt'])
     async def leave_test(self, ctx):
         embed=discord.Embed(
             title=ctx.joinAndLeave.leaveGuildTitle,
@@ -368,7 +368,7 @@ class JoinAndLeave(Cog_Extension):
         await ctx.send(embed=embed)
 
 class ReactionRole(Cog_Extension):
-    @commands.group()
+    @commands.group(name='reaction', aliases=['rea'])
     @has_permissions(manage_roles=True)
     async def reaction(self, ctx):
         ctx.guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
@@ -381,7 +381,7 @@ class ReactionRole(Cog_Extension):
                 await ctx.send('身份組名稱重複')
                 return
 
-    @reaction.command()
+    @reaction.command(name='add', aliases=['a'])
     async def add(self, ctx, msg_id, *arg):
         reaction = BotReactionRoles.objects.filter(guild_id=ctx.guild_id)
         ctx.reaction_num = len(reaction)
@@ -440,7 +440,7 @@ class ReactionRole(Cog_Extension):
             await ctx.send('訊息ID錯誤')
             await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
-    @reaction.command()
+    @reaction.command(name='remove', aliases=['r'])
     async def remove(self, ctx, msg_id:int):
         if ctx.role_dict == {}:
             return
@@ -450,7 +450,7 @@ class ReactionRole(Cog_Extension):
         if msg_id in CACHE_REACTION_ROLE:
             CACHE_REACTION_ROLE.remove(msg_id)
 
-    @reaction.command()
+    @reaction.command(name='look', aliases=['l'])
     async def look(self, ctx):
         if ctx.role_dict == {}:
             return
@@ -491,7 +491,7 @@ class ReactionRole(Cog_Extension):
         await ctx.send(msg)
 
 class Permission(Cog_Extension):
-    @commands.group()
+    @commands.group(name='permission', aliases=['per'])
     @has_permissions(manage_roles=True)
     async def permission(self, ctx):
         ctx.guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
@@ -505,7 +505,7 @@ class Permission(Cog_Extension):
                 return
 
 
-    @permission.command()
+    @permission.command(name='look', aliases=['l'])
     async def look(self, ctx):
         if ctx.role_dict == {}:
             return
@@ -546,7 +546,7 @@ class Permission(Cog_Extension):
         msg += '```'
         await ctx.send(msg)
 
-    @permission.command()
+    @permission.command(name='add', aliases=['a'])
     async def add(self, ctx, per, *args):
         permission_id = ctx.role_dict.get(per)
         if permission_id:
@@ -570,7 +570,7 @@ class Permission(Cog_Extension):
         else:
             await ctx.send(f'查無此身份組: {per}')
 
-    @permission.command()
+    @permission.command(name='remove', aliases=['r'])
     async def remove(self, ctx, per):
         permission_id = ctx.role_dict.get(per)
         if permission_id:
@@ -585,7 +585,7 @@ class Permission(Cog_Extension):
             await ctx.send(f'查無此身份組: {per}')
 
 class Roles(Cog_Extension):
-    @commands.group()
+    @commands.group(name='roles', aliases=['r'])
     async def roles(self, ctx):
         ctx.guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
         roles = []
@@ -598,14 +598,20 @@ class Roles(Cog_Extension):
         for permissionRole in permissionRoles:
             ctx.roles_dict[permissionRole.roles.roles_name] = permissionRole.roles.roles_id
 
-    @roles.command()
+    @roles.command(name='look', aliases=['l'])
     async def look(self, ctx):
-        msg = '您可以變更其他人的身份組: \n'
-        for role in ctx.roles_dict.keys():
-            msg += f'{role} '
-        await ctx.send(msg)
+        roles = ctx.roles_dict.keys()
+        if roles:
+            msg = '您可以變更其他人的身份組: \n```'
+            for role in roles:
+                msg += f'{role} '
+            msg += '```'
+            await ctx.send(msg)
+        else:
+            msg = '您目前無可變更其他人的身份組'
+            await ctx.send(msg)
 
-    @roles.command()
+    @roles.command(name='add', aliases=['a'])
     async def add(self, ctx, user, *role_names):
         roles_name_list = ctx.roles_dict.keys()
         member = await MemberConverter().convert(ctx, user)
@@ -619,7 +625,7 @@ class Roles(Cog_Extension):
         msg += '```'
         await ctx.send(msg)
 
-    @roles.command()
+    @roles.command(name='remove', aliases=['r'])
     async def remove(self, ctx, user, *role_names):
         roles_name_list = ctx.roles_dict.keys()
         member = await MemberConverter().convert(ctx, user)
@@ -633,7 +639,7 @@ class Roles(Cog_Extension):
         msg += '```'
         await ctx.send(msg)
 
-    @roles.command()
+    @roles.command(name='change', aliases=['c'])
     async def change(self, ctx, user, *role_names):
         if '>' in role_names:
             roles_name_list = ctx.roles_dict.keys()
@@ -692,7 +698,7 @@ class Roles(Cog_Extension):
 
 
 class BlockList(Cog_Extension):
-    @commands.group()
+    @commands.group(name='blocklist', aliases=['bl'])
     @has_permissions(manage_roles=True)
     async def blocklist(self, ctx):
         ctx.guild_id = Info_guild.objects.get(guild_id=ctx.guild.id)
@@ -700,8 +706,8 @@ class BlockList(Cog_Extension):
         if not ctx.guildConfig.blackList_is_valid:
             await ctx.send(f'為了避免濫用，此功能為審核制，需驗證公會。')
 
-    @blocklist.command()
-    async def 舉報(self, ctx, username=None, *, msg=None):
+    @blocklist.command(name='report', aliases=['rp'])
+    async def report(self, ctx, username=None, *, msg=None):
         if ctx.guildConfig.blackList_is_valid and username and msg:
             if len(msg)>200 or len(username)>40:
                 await ctx.send(f'角色名稱最大40，事件說明最大200')
@@ -715,8 +721,8 @@ class BlockList(Cog_Extension):
         else:
             await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
-    @blocklist.command()
-    async def 清單(self, ctx):
+    @blocklist.command(name='guild_list', aliases=['gl'])
+    async def guild_list(self, ctx):
         if ctx.guildConfig.blackList_is_valid:
             blocklist = BotBlocklist.objects.filter(guild_id=ctx.guild_id).values('author', 'explanation')
             if blocklist:
@@ -739,8 +745,8 @@ class BlockList(Cog_Extension):
                 await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
 
-    @blocklist.command()
-    async def 查看(self, ctx, username):
+    @blocklist.command(name='look', aliases=['l'])
+    async def look(self, ctx, username):
         if ctx.guildConfig.blackList_is_valid:
             blocklist = BotBlocklist.objects.filter(author=username).values('guild_id__remark', 'explanation')
             if blocklist:
@@ -763,8 +769,8 @@ class BlockList(Cog_Extension):
                     await message.add_reaction(react)
                 await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @blocklist.command()
-    async def 刪除(self, ctx, username=None):
+    @blocklist.command(name='remove', aliases=['r'])
+    async def remove(self, ctx, username=None):
         if ctx.guildConfig.blackList_is_valid and username:
             blocklist = BotBlocklist.objects.filter(guild_id=ctx.guild_id, author=username)
             if blocklist:
@@ -773,8 +779,8 @@ class BlockList(Cog_Extension):
                 return
         await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
-    @blocklist.command()
-    async def 參與公會(self, ctx):
+    @blocklist.command(name='join_guild', aliases=['jg'])
+    async def join_guild(self, ctx):
         if ctx.guildConfig.blackList_is_valid:
             guilds = Info_guildConfig.objects.filter(blackList_is_valid=True).values('guild_id__remark')
             msg = '參與公會清單：\n\n```\n'

@@ -98,8 +98,8 @@ class MsgHandler(Cog_Extension):
             self.previou_msg_dict[msg.channel] = msg.content
         return None
 
-    @commands.command()
-    async def 學(self, ctx, keyword, *arg):
+    @commands.command(name='learn', aliases=['學'])
+    async def learn(self, ctx, keyword, *arg):
         if not ctx.guild:
             await ctx.send('私人頻道無法使用此功能')
             return
@@ -145,8 +145,8 @@ class MsgHandler(Cog_Extension):
             await ctx.message.add_reaction(settings.REACTION_FAILURE)
             await ctx.send(f'請勿使用 *{settings.BOT_NAME}* 開頭的關鍵字 > <')
 
-    @commands.command()
-    async def 忘記(self, ctx, keyword=None, *arg):
+    @commands.command(name='forget', aliases=['fg', '忘記'])
+    async def forget(self, ctx, keyword=None, *arg):
         if not ctx.guild:
             await ctx.send('私人頻道無法使用此功能')
             return
@@ -164,8 +164,8 @@ class MsgHandler(Cog_Extension):
             await ctx.send('請輸入你要查詢的關鍵字喔!')
             await ctx.message.add_reaction(settings.REACTION_FAILURE)
 
-    @commands.command()
-    async def 忘記關鍵字(self, ctx, keyword=None, *arg):
+    @commands.command(name='forgetKeyword', aliases=['fk', '忘記關鍵字'])
+    async def forgetKeyword(self, ctx, keyword=None, *arg):
         if not ctx.guild:
             await ctx.send('私人頻道無法使用此功能')
             return
@@ -206,8 +206,8 @@ class MsgHandler(Cog_Extension):
             await member.send(send_msg)
             await ctx.message.add_reaction(settings.REACTION_SUCCESS)
 
-    @commands.command()
-    async def 查看清單(self, ctx, *arg):
+    @commands.command(name='lookList', aliases=['ll', '查看清單'])
+    async def lookList(self, ctx, *arg):
         if not ctx.guild:
             await ctx.send('私人頻道無法使用此功能')
             return
@@ -252,8 +252,8 @@ class MsgHandler(Cog_Extension):
             return
         await ctx.send(f'疑是出現錯誤，可向{settings.BOT_NAME}密語反應喔！')
 
-    @commands.command()
-    async def 查看關鍵字(self, ctx, keyword=None, *arg):
+    @commands.command(name='lookKeyword', aliases=['lk', '查看關鍵字'])
+    async def lookKeyword(self, ctx, keyword=None, *arg):
         if keyword:
             responds = (
                 BotResponds.objects

@@ -29,8 +29,8 @@ class Base(Cog_Extension):
         data_1 = f"<說話功能> {settings.BOT_NAME}小幫手～\n"
         data_1 += f"```diff\n"
         data_1 += f"+ {settings.BOT_NAME}學習指令\n"
-        data_1 += f"API: {settings.PREFIX}學 <關鍵字> <回應1> <回應2> <回應N>\n"
-        data_1 += f"範例: {settings.PREFIX}學 無聊怎麼辦 打騎士 耍廢 睡覺 看書\n\n"
+        data_1 += f"{settings.PREFIX}learn [關鍵字] [回應1] [回應2] [回應N]\n"
+        data_1 += f"範例: {settings.PREFIX}learn 無聊怎麼辦 打騎士 耍廢 睡覺 看書\n\n"
 
         data_1 += f"觸發回 最後 回應:\n"
         data_1 += f"- ME: 無聊怎麼辦    {settings.BOT_NAME}: 睡覺\n"
@@ -38,15 +38,15 @@ class Base(Cog_Extension):
         data_1 += f"- ME: {settings.BOT_NAME}無聊怎麼辦    {settings.BOT_NAME}: 看書\n\n"
 
         data_1 += f"+ {settings.BOT_NAME}查看指令\n"
-        data_1 += f"API: {settings.PREFIX}查看清單 <空白\\@標記使用者>\n"
+        data_1 += f"{settings.PREFIX}查看清單 [空白\\@標記使用者]\n"
         data_1 += f"說明: 查看伺服器\\使用者有教哪些關鍵字\n"
-        data_1 += f"API: {settings.PREFIX}查看關鍵字 <關鍵字>\n"
+        data_1 += f"{settings.PREFIX}查看關鍵字 [關鍵字]\n"
         data_1 += f"說明: 查看關鍵字內使用者教了有哪些回應\n\n"
 
         data_1 += f"+ {settings.BOT_NAME}忘記指令\n"
-        data_1 += f"API: {settings.PREFIX}忘記 <關鍵字>\n"
+        data_1 += f"{settings.PREFIX}忘記 [關鍵字]\n"
         data_1 += f"說明: 忘記關鍵字內的最後一個回應\n"
-        data_1 += f"API: {settings.PREFIX}忘記關鍵字 <關鍵字>\n"
+        data_1 += f"{settings.PREFIX}忘記關鍵字 [關鍵字]\n"
         data_1 += f"說明: 忘記關鍵字內的全部回應\n"
         data_1 += f"```"
         return data_1
@@ -55,27 +55,27 @@ class Base(Cog_Extension):
         data_2 = f"<隨機功能> {settings.BOT_NAME}小幫手～\n"
         data_2 += f"```diff\n"
         data_2 += f"+ 瑪英小屋小鬼\n"
-        data_2 += f"API:{settings.PREFIX}骰子 <訊息>\n"
+        data_2 += f"{settings.PREFIX}骰子\n"
         data_2 += f"說明：回應數字1~6\n"
         data_2 += f"範例：{settings.PREFIX}骰子 滾動吧骰子\n\n"
 
-        data_2 += f"API:{settings.PREFIX}數字 <訊息>\n"
+        data_2 += f"{settings.PREFIX}數字\n"
         data_2 += f"說明：回應數字1~100\n"
         data_2 += f"範例：{settings.PREFIX}數字 今天的幸運指數是？\n\n"
 
-        data_2 += f"API:{settings.PREFIX}抽獎 <獎品1> <獎品2> <獎品3>\n"
+        data_2 += f"{settings.PREFIX}抽獎 [獎品1] [獎品2] [獎品3]\n"
         data_2 += f"說明：回應隨機獎品\n"
         data_2 += f"範例：{settings.PREFIX}抽獎 馬利 凱雅拉 蓋聯\n\n"
 
-        data_2 += f"API:{settings.PREFIX}是否 <訊息>\n"
+        data_2 += f"{settings.PREFIX}是否\n"
         data_2 += f"範例：{settings.PREFIX}是否 我穿得帥嗎?\n\n"
 
-        data_2 += f"API:{settings.PREFIX}可以不可以 <訊息>\n"
+        data_2 += f"{settings.PREFIX}可以不可以\n"
         data_2 += f"範例：{settings.PREFIX}可以不可以 可以強化武器嗎?\n\n"
 
         data_2 += f"+ 疊塔\n"
-        data_2 += f"API:{settings.PREFIX}塔 <表情符號> <1~5>\n"
-        data_2 += f"API:{settings.PREFIX}進化塔 <表情符號> <1~20>\n"
+        data_2 += f"{settings.PREFIX}塔 [表情符號] [1~5]\n"
+        data_2 += f"{settings.PREFIX}進化塔 [表情符號] [1~20]\n"
         data_2 += f"```"
         return data_2
 
@@ -84,18 +84,17 @@ class Base(Cog_Extension):
         data_9 += f"```diff\n"
 
         data_9 += f"+ 賦予身份組 (打指令的方式賦予身份組)\n"
-        data_9 += f"- 以下指令最前面需打 {settings.PREFIX}roles\n\n"
 
-        data_9 += f"API: look\n"
+        data_9 += f"{settings.PREFIX}roles look\n"
         data_9 += f"說明: 查看目前您可以變更其他人的身份組\n\n"
 
-        data_9 += f"API: add <@使用者(要標記到)> <新增身份組名稱>\n"
+        data_9 += f"{settings.PREFIX}roles add [@標記使用者] [新增身份組名稱]\n"
         data_9 += f"說明: 新增使用者身份組，身份組名稱可多個\n\n"
         
-        data_9 += f"API: remove <@使用者(要標記到)> <移除身份組名稱>\n"
+        data_9 += f"{settings.PREFIX}roles remove [@標記使用者] [移除身份組名稱]\n"
         data_9 += f"說明: 移除使用者身份組，身份組名稱可多個\n\n"
 
-        data_9 += f"API: change <@使用者(要標記到)> <新增身份組名稱> > <移除身份組名稱> \n"
+        data_9 += f"{settings.PREFIX}roles change [@標記使用者] [新增身份組名稱] > [移除身份組名稱] \n"
         data_9 += f"說明: 變更使用者身份組，身份組名稱可多個，新增移除中間需 > 符號\n\n"
 
         data_9 += f"```"
@@ -105,18 +104,21 @@ class Base(Cog_Extension):
         data_10 = f"<管理者\\特殊功能> {settings.BOT_NAME}小幫手～\n"
         data_10 += f"```diff\n"
         data_10 += f"+ 特殊功能\n"
-        data_10 += f"API: {settings.PREFIX}ping\n"
+        data_10 += f"{settings.PREFIX}ping\n"
         data_10 += f"說明: 查看延遲\n"
-        data_10 += f"API: {settings.PREFIX}sayd <訊息>\n"
+        data_10 += f"{settings.PREFIX}sayd <訊息>\n"
         data_10 += f"說明: 偽裝{settings.BOT_NAME}發送訊息(刪除後發送)\n\n"
-        data_10 += f"API: {settings.PREFIX}限時 <1~1800> <訊息>\n"
+        data_10 += f"{settings.PREFIX}限時 <1~1800> <訊息>\n"
         data_10 += f"說明: 限時<1~1800>秒刪除訊息\n\n"
 
         data_10 += f"+ 管理者功能(需管理身份祖權限)\n"
-        data_10 += f"API: {settings.PREFIX}clean <1~200>\n"
-        data_10 += f"說明: 清除<1~200>條訊息\n"
-        data_10 += f"API: {settings.PREFIX}setting look\n"
+        data_10 += f"{settings.PREFIX}setting look\n"
         data_10 += f"說明: 查看目前{settings.BOT_NAME}設定\n"
+
+        data_10 += f"+ 管理者功能(需管理訊息權限)\n"
+        data_10 += f"{settings.PREFIX}clean <1~200>\n"
+        data_10 += f"說明: 清除<1~200>條訊息\n"
+
         data_10 += f"```"
         return data_10
 
@@ -132,24 +134,24 @@ class Base(Cog_Extension):
         data_99 = f"<持有者功能> {settings.BOT_NAME}小幫手～\n"
         data_99 += f"```diff\n"
         data_99 += f"+ 模塊讀取\n"
-        data_99 += f"API: {settings.PREFIX}load <模塊>\n"
-        data_99 += f"API: {settings.PREFIX}unload <模塊>\n"
-        data_99 += f"API: {settings.PREFIX}reload <模塊>\n\n"
+        data_99 += f"{settings.PREFIX}load <模塊>\n"
+        data_99 += f"{settings.PREFIX}unload <模塊>\n"
+        data_99 += f"{settings.PREFIX}reload <模塊>\n\n"
 
         data_99 += f"\n{settings.BOT_NAME}的狀態"
-        data_99 += f"API: {settings.PREFIX}change_presence <狀態> <動作> <訊息>\n"
-        data_99 += f"說明: 狀態可選<上線/閒置/忙碌/隱形>，動作可選<音樂/遊戲/影片>\n\n"
+        data_99 += f"{settings.PREFIX}change_presence <狀態> <動作> <訊息>\n"
+        data_99 += f"說明: 狀態可選[上線/閒置/忙碌/隱形]，動作可選[音樂/遊戲/影片]\n\n"
 
         data_99 += f"+ {settings.BOT_NAME}打招呼\n"
-        data_99 += f"API: {settings.PREFIX}學打招呼 <訊息>\n"
+        data_99 += f"{settings.PREFIX}學打招呼 [訊息]\n"
 
         data_99 += f"+ {settings.BOT_NAME}密語\n"
-        data_99 += f"API: {settings.PREFIX}回 <使用者ID> <訊息>\n"
+        data_99 += f"{settings.PREFIX}回 [使用者ID] [訊息]\n"
         data_99 += f"說明: 使用{settings.BOT_NAME}跟使用這密語對話\n\n"
         data_99 += f"```"
         return data_99
 
-    @commands.command()
+    @commands.command(name='help', aliases=['h'])
     async def help(self, ctx):
         buttonActionDict = {
             settings.REACTION_0: 0, 
