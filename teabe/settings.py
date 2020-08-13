@@ -70,6 +70,9 @@ REACTION_ADMIN = '🔓'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'default'
 
+# 啟用channels必要的參數
+ASGI_APPLICATION = 'teabe.routing.application'
+
 # logging
 MAIN_LOG_PATH = os.path.join(BASE_DIR, 'logs/main.log')
 LOG_DIR = os.path.dirname(MAIN_LOG_PATH)
@@ -122,6 +125,7 @@ INSTALLED_APPS = [
     'bot.apps.BotConfig',
     'django_celery_beat',
     'django_celery_results',
+    'channels',
 ]
 
 MIDDLEWARE = [
