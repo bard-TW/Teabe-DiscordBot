@@ -6,7 +6,7 @@ from .models import JoinAndLeaveGuild, BotReactionRoles, Info_roles, BotPermissi
 
 
 class BotRespondsAdmin(admin.ModelAdmin):
-    list_display = ('keyword', 'respond', 'guild_id', 'author_id', 'update_time')
+    list_display = ('guild_id', 'author_id', 'update_time', 'keyword', 'respond')
     list_filter = ('guild_id', 'author_id')  # 塞選條件
     fields = ['keyword', ('guild_id', 'author_id'), 'respond', 'update_time']  # django編輯的排版
 admin.site.register(BotResponds, BotRespondsAdmin)

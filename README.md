@@ -37,3 +37,8 @@ ___
 ## 備註
 
 這是單人開發專案，大部分皆是為了好玩而寫，沒時間壓力，所以開發緩慢，未來等功能基本齊了，在寫安裝教學。
+
+### 啟動 celery 指令
+
+celery worker -A teabe -l info
+celery -A teabe beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler

@@ -344,17 +344,6 @@ class MsgHandler(Cog_Extension):
                         await reaction.message.edit(content=data)
                         rea.time=datetime.now()
 
-                now = datetime.now()
-                for msg_id in list(CACHE_REACTION):
-                    if (now - CACHE_REACTION[msg_id].time).seconds > 600:
-                        try:
-                            for react in CACHE_REACTION[msg_id].buttonActionDict.keys():
-                                await CACHE_REACTION[msg_id].msg.remove_reaction(react, self.bot.user)
-                            del(CACHE_REACTION[msg_id])
-                        except Exception as e:
-                            del(CACHE_REACTION[msg_id])
-                            print((now - CACHE_REACTION[msg_id].time).seconds, e, user.bot, user)
-
 
 def setup(bot):
     bot.add_cog(MsgHandler(bot))

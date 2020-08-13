@@ -63,6 +63,12 @@ REACTION_10 = '🔟'
 REACTION_NEW = '🐇'
 REACTION_ADMIN = '🔓'
 
+# CELERY 設定
+# CELERY_BROKER_URL = 'redis://localhost:6379' # 不設定也能運作
+# CELERY_BACKEND_URL = 'redis://localhost:6379' # 不設定也能運作
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'default'
 
 # logging
 MAIN_LOG_PATH = os.path.join(BASE_DIR, 'logs/main.log')
@@ -114,6 +120,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bot.apps.BotConfig',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -131,7 +139,7 @@ ROOT_URLCONF = 'teabe.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'bot')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -190,6 +198,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+CELERY_TIMEZONE = TIME_ZONE
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
